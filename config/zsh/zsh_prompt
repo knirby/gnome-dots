@@ -1,0 +1,15 @@
+autoload -Uz vcs_info add-zsh-hook
+add-zsh-hook precmd vcs_info
+
+zstyle ':vcs_info:git:*' formats ' (%b)'
+zstyle ':vcs_info:git:*' actionformats ' (%b|%a)'
+
+setopt PROMPT_SUBST
+
+if (( EUID == 0 )); then
+    PROMPT='%F{white}(%f%(?.%F{green}0%f.%F{red}%?%f)%F{white})%f %F{cyan}%d%f%F{yellow}${vcs_info_msg_0_}%f %F{red}%B#%b%f '
+else
+    PROMPT='%F{white}(%f%(?.%F{green}0%f.%F{red}%?%f)%F{white})%f %F{cyan}%d%f%F{yellow}${vcs_info_msg_0_}%f %F{green}%B$%b%f '
+fi
+
+RPROMPT='%F{8}%*%f'

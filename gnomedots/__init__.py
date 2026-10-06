@@ -1,6 +1,6 @@
 """knirby-gnomedots: one command from a stock GNOME desktop to knirby's setup."""
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 APP_NAME = "knirby-gnomedots"
 REPO = "knirby/gnome-dots"

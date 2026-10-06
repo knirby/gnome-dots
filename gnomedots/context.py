@@ -20,6 +20,7 @@ class Options:
     force: bool = False
     skip: set[str] = field(default_factory=set)
     only: set[str] = field(default_factory=set)
+    with_: set[str] = field(default_factory=set)   # opt-in addons to include
 
 
 class Context:
@@ -29,6 +30,7 @@ class Context:
         self.vars: dict = {}
         self.failures: list[str] = []
         self.allow_untested_pm = False
+        self.selected: set[str] = set()   # modules taking part in this run
 
     # -- configuration files ---------------------------------------------
 
@@ -107,10 +109,12 @@ class Context:
         for name in ("terminal", "software", "extensions_app"):
             self.__dict__.pop(name, None)
 
-    def wants(self, module: str) -> bool:
+    def wants(self, module, default: bool = True) -> bool:
         if self.options.only:
             return module in self.options.only
-        return module not in self.options.skip
+        if module in self.options.skip:
+            return False
+        return default or module in self.options.with_
 
     def wallpaper_dir(self) -> Path:
         return paths.pictures_dir() / self.themes_config["wallpaper"]["folder"]

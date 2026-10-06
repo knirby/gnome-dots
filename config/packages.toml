@@ -3,7 +3,8 @@
 #   required = true   the install stops if it can't be installed
 #   (otherwise)       installed when the repositories carry it, skipped if not
 #
-# A package manager missing from an entry means "not packaged there". Themes
+# A package manager missing from an entry means "not packaged there".
+# `module` ties a package to an opt-in addon: installed only with that addon. Themes
 # that a distribution doesn't package are downloaded from upstream instead
 # (see themes.toml).
 
@@ -125,3 +126,21 @@ dnf = "gnome-extensions-app"
 [menulibre]
 why = "menu editor, linked from ArcMenu"
 apt = "menulibre"
+
+[zsh]
+why = "the zsh addon"
+module = "zsh"
+apt = "zsh"
+dnf = "zsh"
+pacman = "zsh"
+portage = "app-shells/zsh"
+xbps = "zsh"
+
+[git]
+why = "the zsh addon (Oh My Zsh and its plugins)"
+module = "zsh"
+apt = "git"
+dnf = "git"
+pacman = "git"
+portage = "dev-vcs/git"
+xbps = "git"

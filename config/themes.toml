@@ -20,9 +20,11 @@ url = "https://github.com/ful1e5/Bibata_Cursor/releases/latest/download/Bibata-M
 prefix = ""
 size = "about 3 MB"
 
-# Wallpaper: today's Bing picture is fetched once at install time so the
-# desktop looks right on first login; the Wallpaper Slideshow extension takes
-# over from there.
+# Wallpaper: today's Bing picture is set at install time, then an hourly job
+# fetches each new one (and shows it once) for the Wallpaper Slideshow
+# extension to cycle through. Pictures are kept until the folder passes
+# keep_mb, then the oldest go; `knirby-gnomedots wallpapers clean` empties it.
 [wallpaper]
 market = "ja-JP"
 folder = "Bing Wallpapers"   # inside the user's Pictures folder
+keep_mb = 200

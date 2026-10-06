@@ -9,6 +9,7 @@ class Module:
     summary = ""
     needs_dconf = False      # writes settings, so needs dconf and a session bus
     needs_network = False
+    default = True           # False: opt-in addon, only run when asked for
 
     def plan(self, ctx: Context) -> list[str]:
         """What apply() would change, one line per item, for the confirmation."""

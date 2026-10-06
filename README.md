@@ -1,6 +1,9 @@
 # gnome-dots
 
-knirby's GNOME desktop in one command: dark Adwaita with an orange accent, Mint-Y-Grey icons, the Bibata Modern Ice cursor, frosted blur everywhere, rounded windows, ArcMenu with your distribution's logo, a system monitor in the top bar, a bottom dock and a new Bing wallpaper every day. It's written in Python, so it works the same from bash, zsh or fish, on any of the supported distributions. Built for GNOME 50. Licensed under GPL-3.0-only; see [LICENSE](LICENSE).
+knirby's GNOME desktop in one command: dark Adwaita with an accent colour that follows the wallpaper, Mint-Y-Grey icons, the Bibata Modern Ice cursor, frosted blur everywhere, rounded windows, ArcMenu with your distribution's logo, a system monitor in the top bar, a bottom dock and a new Bing wallpaper every day. It's written in Python, so it works the same from bash, zsh or fish, on any of the supported distributions. Built for GNOME 50. Licensed under GPL-3.0-only; see [LICENSE](LICENSE).
+
+![The desktop over a Bing picture of a mossy forest](docs/preview-forest.webp)
+![The same desktop over penguins on snow: the accent colour has followed the wallpaper](docs/preview-penguins.webp)
 
 ## Install
 
@@ -37,7 +40,7 @@ On [Bedrock Linux](https://bedrocklinux.org), packages go to the stratum that pr
 | `packages` | Noto Sans/Serif and Fira Code fonts, Ptyxis, GNOME Tweaks, dconf and the build tools, from your repositories |
 | `themes` | Mint-Y-Grey icons and Bibata Modern Ice; downloaded from upstream into `~/.local/share/icons` where the distribution doesn't package them |
 | `extensions` | 18 extensions (below), built for your GNOME version; conflicting ones (Ubuntu Dock, Dash to Panel, ...) are disabled, never removed |
-| `wallpaper` | today's Bing picture right away; Wallpaper Slideshow downloads a new one daily into `~/Pictures/Bing Wallpapers` and cycles them every 10 minutes |
+| `wallpaper` | today's Bing picture right away, then each new one as it comes out, shown once on arrival; Wallpaper Slideshow cycles them every 10 minutes and old ones are kept up to 200 MB (details below) |
 | `settings` | theme, fonts, clock, windows, workspaces, the dock favourites, and every extension's configuration |
 | `input` | flat mouse acceleration and speed, num lock on; keyboard layouts are left alone |
 | `keybindings` | the shortcuts below |
@@ -45,8 +48,13 @@ On [Bedrock Linux](https://bedrocklinux.org), packages go to the stratum that pr
 | `sysmon` | finds this machine's CPU temperature sensor, a spinning fan (or a GPU/disk temperature), the GPU and the system disk for the top bar monitor, without asking |
 | `gtk` | translucent header bars in GTK 4 apps, as a marked block in `~/.config/gtk-4.0/gtk.css` |
 | `command` | the `knirby-gnomedots` command, with `~/.local/bin` added to bash, zsh and fish if it isn't on PATH yet |
+| `zsh` | **optional addon**: Oh My Zsh with git, sudo, zsh-autosuggestions and zsh-syntax-highlighting, knirby's prompt (`(exit status) /path (branch) $`, time on the right) and zsh as the login shell |
 
-Leave modules out with `--skip input gtk`, or run only some with `--only settings`.
+Leave modules out with `--skip input gtk`, or run only some with `--only settings`. The installer asks about the zsh addon; `--with zsh` includes it without asking. An existing `~/.zshrc` is kept as `~/.zshrc.pre-knirby-gnomedots`, and your own additions belong in `~/.zshrc.local`.
+
+The accent colour comes from Auto Accent Colour, which picks it from each wallpaper, so it changes with the Bing picture.
+
+**Bing wallpapers.** Wallpaper Slideshow's own downloader refetches 12 hours after its last fetch, timed on a clock that stops during suspend and restarts at every login, so a machine that sleeps a lot can go days without a new picture. The setup adds an hourly check: a systemd user timer that also catches up after suspend, or a check that starts at login where systemd doesn't manage user services. It fetches the newest pictures under the same names the extension uses, switches to each day's picture once when it arrives, and falls back to 1920x1080 where Bing doesn't publish the chosen size. Pictures stay in `~/Pictures/Bing Wallpapers` until the folder passes 200 MB (`keep_mb` in [config/themes.toml](config/themes.toml)); then the oldest are deleted, never the one on screen.
 
 **Extensions:** ArcMenu, Blur my Shell, Dash to Dock, Just Perfection, Astra Monitor, Wallpaper Slideshow, Auto Accent Colour, Rounded Window Corners Reborn, Global Menu, Medialine, Clipboard Indicator, Lightning Launcher, Desktop Icons NG, GNOME UI Tune, Unlock Dialog Background, AppIndicator Support, Removable Drive Menu and [Super Scroll Zoom](https://github.com/knirby/super-scroll-zoom). They come from extensions.gnome.org, except Super Scroll Zoom, which comes from its GitHub repository, and Blur my Shell, which is built from upstream commit `99660f4` instead of the extensions.gnome.org release. Its version is set to 9999, so GNOME's automatic updates and Extension Manager leave it alone.
 
@@ -81,6 +89,9 @@ knirby-gnomedots status            # what's installed, extension versions
 knirby-gnomedots update            # update the tool and the extensions from GitHub
 knirby-gnomedots apply settings    # re-apply one or more modules
 knirby-gnomedots detect            # what it found: distro, terminal, sensors, GPU, disk
+knirby-gnomedots wallpapers        # how many pictures, how much space
+knirby-gnomedots wallpapers sync   # fetch the newest Bing pictures now
+knirby-gnomedots wallpapers clean  # delete saved pictures except the current one (--all: that too)
 knirby-gnomedots backup            # back up the current settings
 knirby-gnomedots restore [NAME]    # put managed settings back from a backup
 knirby-gnomedots uninstall         # remove everything it added
@@ -89,7 +100,7 @@ knirby-gnomedots version
 
 `update` pulls the latest version of this repository, updates the extensions and re-detects the hardware. When the new version changes the configuration, it asks before re-applying it, and backs up your settings first. `--check` only reports whether an update exists.
 
-`uninstall` removes the extensions it installed (ones you already had stay), the themes it downloaded, its file blocks, the command and its copy of the repository. It then puts back every setting it changed from the backup taken before the first install, unless you pass `--keep-settings`. It offers to remove the packages it installed, but never removes them unasked. Backups stay in `~/.local/state/knirby-gnomedots/backups`.
+`uninstall` removes the extensions it installed (ones you already had stay), the themes it downloaded, the hourly wallpaper check, its file blocks, the zsh addon (putting your old `.zshrc` back), the command and its copy of the repository. Downloaded wallpapers stay. It then puts back every setting it changed from the backup taken before the first install, unless you pass `--keep-settings`. It offers to remove the packages it installed, but never removes them unasked. Backups stay in `~/.local/state/knirby-gnomedots/backups`.
 
 Every command accepts `--yes` to skip the questions, `--dry-run` to change nothing and `--verbose` to show each step. The log of the last run is at `~/.local/state/knirby-gnomedots/last-run.log` (`knirby-gnomedots status --log`).
 

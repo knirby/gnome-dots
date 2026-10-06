@@ -23,6 +23,8 @@ class Packages(Module):
         family = backend.family if backend else None
         entries = []
         for role, entry in ctx.packages_config.items():
+            if entry.get("module") and entry["module"] not in ctx.selected:
+                continue
             if entry.get("theme") and theme_present(entry["theme"]):
                 continue
             pkg = entry.get(family) if family else None

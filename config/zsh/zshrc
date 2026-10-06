@@ -1,0 +1,20 @@
+# knirby-gnomedots zsh profile.
+# Your own additions go in ~/.zshrc.local, which updates never touch.
+# `knirby-gnomedots uninstall` puts back the .zshrc you had before.
+
+# knirby-gnomedots and other user tools live here.
+[[ ":$PATH:" == *":$HOME/.local/bin:"* ]] || export PATH="$HOME/.local/bin:$PATH"
+
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME=""
+plugins=(git sudo zsh-autosuggestions zsh-syntax-highlighting)
+source "$ZSH/oh-my-zsh.sh"
+
+# Prompt: (exit status) /full/path (git branch) $, with the time on the right.
+[[ -r ~/.zsh_prompt ]] && source ~/.zsh_prompt
+
+# Grey comments on the command line.
+typeset -gA ZSH_HIGHLIGHT_STYLES
+ZSH_HIGHLIGHT_STYLES[comment]='fg=8'
+
+[[ -r ~/.zshrc.local ]] && source ~/.zshrc.local

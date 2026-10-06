@@ -71,7 +71,7 @@ class Settings(Module):
     def plan(self, ctx):
         t = ctx.terminal
         return [
-            "dark Adwaita, orange accent, Mint-Y-Grey icons, Bibata cursor, Noto Sans + Fira Code",
+            "dark Adwaita, accent colour picked from the wallpaper, Mint-Y-Grey icons, Bibata cursor, Noto Sans + Fira Code",
             "top bar: ArcMenu, Astra Monitor, media, clock on the right; dock at the bottom",
             "blur everywhere, rounded corners, 2 fixed workspaces",
             f"terminal: {t['cmd'] if t else 'none found'}",

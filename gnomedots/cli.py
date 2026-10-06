@@ -10,7 +10,7 @@ import tarfile
 import tempfile
 from pathlib import Path
 
-from . import APP_NAME, BRANCH, REPO, SUPPORTED_SHELL, __version__, hardware, ui, util
+from . import APP_NAME, BRANCH, REPO, SUPPORTED_SHELL, __version__, hardware, ui, util, wallpapers
 from .context import Context, Options
 from .gnome import dconf
 from .gnome import extensions as ext
@@ -31,8 +31,9 @@ def make_context(args) -> Context:
     ui.dry_run = getattr(args, "dry_run", False)
     ui.verbose = getattr(args, "verbose", False)
     opts = Options(assume_yes=ui.assume_yes, dry_run=ui.dry_run, force=getattr(args, "force", False),
-                   skip=set(getattr(args, "skip", None) or []), only=set(getattr(args, "only", None) or []))
-    for name in opts.skip | opts.only:
+                   skip=set(getattr(args, "skip", None) or []), only=set(getattr(args, "only", None) or []),
+                   with_=set(getattr(args, "with_", None) or []))
+    for name in opts.skip | opts.only | opts.with_:
         if name not in BY_NAME:
             raise SystemExit(f"error: no module called {name!r}; see `{APP_NAME} modules`")
     return Context(opts)
@@ -112,7 +113,16 @@ def preflight(ctx: Context, modules) -> bool:
 
 
 def selected(ctx: Context):
-    return [m for m in ALL if ctx.wants(m.name)]
+    """The modules for this run; asks about opt-in addons nobody mentioned."""
+    o = ctx.options
+    if not o.only and not ui.assume_yes and sys.stdin.isatty():
+        for m in ALL:
+            if not m.default and m.name not in o.with_ | o.skip:
+                if ui.confirm(f"Also set up the {m.title}? ({m.summary.removeprefix('optional: ')})", False):
+                    o.with_.add(m.name)
+    modules = [m for m in ALL if ctx.wants(m.name, m.default)]
+    ctx.selected = {m.name for m in modules}
+    return modules
 
 
 def show_plan(ctx: Context, modules) -> None:
@@ -193,6 +203,7 @@ def cmd_install(args) -> int:
 def cmd_apply(args) -> int:
     args.only = args.modules
     args.skip = []
+    args.with_ = []
     return cmd_install(args)
 
 
@@ -249,6 +260,48 @@ def cmd_post_update(args) -> int:
     return post_update(ctx, args.reapply)
 
 
+def cmd_wallpapers(args) -> int:
+    ctx = make_context(args)
+    s = wallpapers.Settings(ctx.themes_config["wallpaper"])
+    if args.action == "sync":
+        if args.quiet:
+            ui.verbose = False
+        if args.watch:
+            wallpapers.watch(s)
+        try:
+            r = wallpapers.sync(s)
+        except Exception as e:
+            ui.error(f"Couldn't reach Bing: {e}")
+            return 1
+        if not args.quiet:
+            ui.ok(f"{len(r['new'])} new picture(s)" + (f"; showing {r['today'].name}" if r["switched"] else ""))
+            if r["removed"]:
+                ui.ok(f"Trimmed {len(r['removed'])} old picture(s) to stay under {s.limit // 2**20} MB")
+        return 0
+    if args.action == "clean":
+        files = wallpapers.images(s.folder)
+        current = wallpapers.current_wallpaper()
+        doomed = [p for p in files if args.all or p != current]
+        if not doomed:
+            ui.ok("Nothing to clean")
+            return 0
+        mb = sum(p.stat().st_size for p in doomed) / 2**20
+        keep = "" if args.all or current not in files else " (the current wallpaper stays)"
+        if not ui.confirm(f"Delete {len(doomed)} picture(s), {mb:.0f} MB, from {s.folder}{keep}?", False):
+            return 1
+        removed = wallpapers.clean(s, keep_current=not args.all)
+        ui.ok(f"Deleted {len(removed)} picture(s); new ones keep arriving every day")
+        return 0
+    files = wallpapers.images(s.folder)
+    total = wallpapers.size(s.folder)
+    print(f"folder:   {s.folder}")
+    print(f"pictures: {len(files)}, {total / 2**20:.1f} MB of {s.limit // 2**20} MB kept")
+    print(f"newest:   {files[-1].name if files else 'none'}")
+    print(f"showing:  {(wallpapers.current_wallpaper() or Path('none')).name}")
+    print(f"market:   {s.market}, {s.resolution}")
+    return 0
+
+
 def post_update(ctx: Context, reapply: bool) -> int:
     changed = False
     ext_mod = BY_NAME["extensions"]
@@ -265,6 +318,8 @@ def post_update(ctx: Context, reapply: bool) -> int:
     if ext.find("monitor@astraext.github.io"):
         BY_NAME["sysmon"].apply(ctx)
     BY_NAME["command"].apply(ctx)
+    if "wallpaper" in ctx.state["modules"] and dconf.available():
+        wallpapers.install_schedule()
 
     new_hash = util.tree_hash(CONFIG_DIR)
     if new_hash != ctx.state.get("config_hash"):
@@ -272,7 +327,9 @@ def post_update(ctx: Context, reapply: bool) -> int:
         ui.info("This version changes the desktop configuration.")
         reapply = reapply or ui.confirm("Re-apply it now? (your current settings are backed up first)", False)
         if reapply:
-            mods = [m for m in ALL if m.name not in ("packages", "extensions", "command")]
+            mods = [m for m in ALL if m.name not in ("packages", "extensions", "command")
+                    and (m.default or m.name in ctx.state["modules"])]
+            ctx.selected = {m.name for m in mods}
             if not run_modules(ctx, mods, "before-update"):
                 return 1
             ctx.state["config_hash"] = new_hash
@@ -297,13 +354,15 @@ def cmd_uninstall(args) -> int:
     plan = [
         f"remove {len(ours)} extensions it installed (ones you had before stay)",
         f"remove downloaded themes: {', '.join(st['themes']) or 'none'}",
-        "remove the gtk.css block, the Super+T shortcut and the Tux logo",
+        "remove the gtk.css block, the Super+T shortcut, the Tux logo and the hourly wallpaper job",
         f"remove {LAUNCHER}, {APP_DIR} and the PATH lines it added",
     ]
     if restore:
         plan.insert(0, f"put back the settings it changed, from {Path(initial).name}")
     else:
         plan.insert(0, "keep the current settings" + ("" if initial else " (no pre-install backup found)"))
+    if st.get("zsh"):
+        plan.append("put back your previous .zshrc and remove the Oh My Zsh it installed")
     if st["packages_added"]:
         plan.append("offer to remove the packages it installed")
     ui.bullet_list(plan)
@@ -315,6 +374,8 @@ def cmd_uninstall(args) -> int:
         ui.ok(f"Current settings backed up to {folder}")
     steps = [
         ("extensions", lambda: BY_NAME["extensions"].remove(ctx)),
+        ("wallpaper", lambda: BY_NAME["wallpaper"].remove(ctx)),
+        ("zsh", lambda: BY_NAME["zsh"].remove(ctx)),
         ("settings", lambda: restore and dconf.restore(Path(initial), st["dconf_sections"], st["dconf_trees"])),
         ("keybindings", lambda: BY_NAME["keybindings"].remove(ctx)),
         ("themes", lambda: BY_NAME["themes"].remove(ctx)),
@@ -359,6 +420,9 @@ def cmd_status(args) -> int:
     print(f"  GNOME Shell: {f'{v[0]}.{v[1]}' if v else 'not found'} ({session.session_type()})")
     print(f"  command:     {LAUNCHER if LAUNCHER.exists() else 'not installed'}")
     print(f"  backups:     {len(dconf.list_backups())} in {BACKUP_DIR}")
+    folder = wallpapers.Settings(ctx.themes_config["wallpaper"]).folder
+    print(f"  wallpapers:  {len(wallpapers.images(folder))} pictures, "
+          f"{wallpapers.size(folder) / 2**20:.0f} MB in {folder}")
     print("\nExtensions:")
     on = set(ext.enabled())
     for e in ctx.extensions:
@@ -459,6 +523,8 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("install", parents=[common], help="set everything up (safe to rerun)")
     s.add_argument("--skip", nargs="+", metavar="MODULE", default=[], help="leave out these modules")
     s.add_argument("--only", nargs="+", metavar="MODULE", default=[], help="run only these modules")
+    s.add_argument("--with", dest="with_", nargs="+", metavar="ADDON", default=[],
+                   help="include opt-in addons (zsh)")
     s.add_argument("--force", action="store_true", help="run on an untested GNOME version")
     s.set_defaults(func=cmd_install)
 
@@ -484,6 +550,13 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("status", parents=[common], help="show what's installed")
     s.add_argument("--log", action="store_true", help="print the log of the last run")
     s.set_defaults(func=cmd_status)
+
+    s = sub.add_parser("wallpapers", parents=[common], help="Bing wallpapers: status, sync or clean")
+    s.add_argument("action", nargs="?", choices=["status", "sync", "clean"], default="status")
+    s.add_argument("--all", action="store_true", help="clean: delete the current wallpaper too")
+    s.add_argument("--quiet", action="store_true", help=argparse.SUPPRESS)
+    s.add_argument("--watch", action="store_true", help=argparse.SUPPRESS)
+    s.set_defaults(func=cmd_wallpapers)
 
     sub.add_parser("version", help="print the version").set_defaults(func=cmd_version)
     sub.add_parser("detect", parents=[common], help="show what was detected on this machine").set_defaults(func=cmd_detect)
