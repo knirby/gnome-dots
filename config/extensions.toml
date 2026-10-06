@@ -1,0 +1,153 @@
+# GNOME Shell extensions, in the order they're installed.
+#
+#   source = "ego"      extensions.gnome.org, the build for the running GNOME
+#   source = "github"   a GitHub repository: the head of `branch`, or exactly
+#                       `commit` when pinned; `build` is run in the checkout
+#                       and `artifact` is the zip it produces (without `build`
+#                       the repository root is the extension)
+#   settings            dconf template in dconf/extensions/ (reset, then loaded)
+#   dconf               the extension's settings folder
+#   pin_version         stamp this version into metadata.json after installing,
+#                       so GNOME's automatic updates and Extension Manager never
+#                       replace the build; `knirby-gnomedots update` still
+#                       upgrades it, tracking the real version on its own
+
+[[extension]]
+uuid = "arcmenu@arcmenu.com"
+name = "ArcMenu"
+source = "ego"
+settings = "arcmenu.ini"
+dconf = "/org/gnome/shell/extensions/arcmenu/"
+
+[[extension]]
+uuid = "blur-my-shell@aunetx"
+name = "Blur my Shell"
+# Built from this exact upstream commit, not the extensions.gnome.org release.
+source = "github"
+repo = "aunetx/blur-my-shell"
+commit = "99660f4e87eab4ea1e02e39e79cebf7cfa320dbb"
+build = ["make", "build"]
+artifact = "build/blur-my-shell@aunetx.shell-extension.zip"
+pin_version = 9999
+settings = "blur-my-shell.ini"
+dconf = "/org/gnome/shell/extensions/blur-my-shell/"
+
+[[extension]]
+uuid = "dash-to-dock@micxgx.gmail.com"
+name = "Dash to Dock"
+source = "ego"
+settings = "dash-to-dock.ini"
+dconf = "/org/gnome/shell/extensions/dash-to-dock/"
+
+[[extension]]
+uuid = "just-perfection-desktop@just-perfection"
+name = "Just Perfection"
+source = "ego"
+settings = "just-perfection.ini"
+dconf = "/org/gnome/shell/extensions/just-perfection/"
+
+[[extension]]
+uuid = "monitor@astraext.github.io"
+name = "Astra Monitor"
+source = "ego"
+settings = "astra-monitor.ini"
+dconf = "/org/gnome/shell/extensions/astra-monitor/"
+
+[[extension]]
+uuid = "azwallpaper@azwallpaper.gitlab.com"
+name = "Wallpaper Slideshow"
+source = "ego"
+settings = "azwallpaper.ini"
+dconf = "/org/gnome/shell/extensions/azwallpaper/"
+
+[[extension]]
+uuid = "auto-accent-colour@Wartybix"
+name = "Auto Accent Colour"
+source = "ego"
+settings = "auto-accent-colour.ini"
+dconf = "/org/gnome/shell/extensions/auto-accent-colour/"
+
+[[extension]]
+uuid = "rounded-window-corners@fxgn"
+name = "Rounded Window Corners Reborn"
+source = "ego"
+settings = "rounded-window-corners.ini"
+dconf = "/org/gnome/shell/extensions/rounded-window-corners-reborn/"
+
+[[extension]]
+uuid = "globalmenu@ShiroOSL.github.io"
+name = "Global Menu"
+source = "ego"
+settings = "globalmenu.ini"
+dconf = "/org/gnome/shell/extensions/globalmenu/"
+
+[[extension]]
+uuid = "medialine@funinkina.co.in"
+name = "Medialine"
+source = "ego"
+settings = "medialine.ini"
+dconf = "/org/gnome/shell/extensions/medialine/"
+
+[[extension]]
+uuid = "clipboard-indicator@tudmotu.com"
+name = "Clipboard Indicator"
+source = "ego"
+settings = "clipboard-indicator.ini"
+dconf = "/org/gnome/shell/extensions/clipboard-indicator/"
+
+[[extension]]
+uuid = "lightning-gnome-launcher@avimanyu"
+name = "Lightning Launcher"
+source = "ego"
+settings = "lightning-launcher.ini"
+dconf = "/org/gnome/shell/extensions/lightning-launcher/"
+
+[[extension]]
+uuid = "gtk4-ding@smedius.gitlab.com"
+name = "Desktop Icons NG"
+source = "ego"
+settings = "gtk4-ding.ini"
+dconf = "/org/gnome/shell/extensions/gtk4-ding/"
+
+[[extension]]
+uuid = "gnome-ui-tune@itstime.tech"
+name = "GNOME UI Tune"
+source = "ego"
+settings = "gnome-ui-tune.ini"
+dconf = "/org/gnome/shell/extensions/gnome-ui-tune/"
+
+[[extension]]
+uuid = "unlockDialogBackground@sun.wxg@gmail.com"
+name = "Unlock Dialog Background"
+source = "ego"
+settings = "unlock-dialog-background.ini"
+dconf = "/org/gnome/shell/extensions/unlock-dialog-background/"
+
+[[extension]]
+uuid = "appindicatorsupport@rgcjonas.gmail.com"
+name = "AppIndicator Support"
+source = "ego"
+
+[[extension]]
+uuid = "drive-menu@gnome-shell-extensions.gcampax.github.com"
+name = "Removable Drive Menu"
+source = "ego"
+
+[[extension]]
+uuid = "super-scroll-zoom@knirby.github.io"
+name = "Super Scroll Zoom"
+source = "github"
+repo = "knirby/super-scroll-zoom"
+branch = "main"
+
+# Extensions that fight the ones above; disabled (never removed) if present.
+[conflicts]
+uuids = [
+    "ubuntu-dock@ubuntu.com",                       # second dock beside Dash to Dock
+    "ubuntu-appindicators@ubuntu.com",              # tray icons twice, beside AppIndicator Support
+    "ding@rastersoft.com",                          # older desktop icons, beside Desktop Icons NG
+    "dash-to-panel@jderose9.github.com",            # replaces the top bar this setup styles
+    "apps-menu@gnome-shell-extensions.gcampax.github.com",   # second menu beside ArcMenu
+    "places-menu@gnome-shell-extensions.gcampax.github.com",
+    "window-list@gnome-shell-extensions.gcampax.github.com",
+]

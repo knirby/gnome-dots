@@ -1,0 +1,4 @@
+/* Translucent header bars in GTK 4 / libadwaita apps. */
+@define-color headerbar_bg_color rgba(36, 36, 36, 0.55);
+@define-color headerbar_backdrop_color rgba(36, 36, 36, 0.55);
+@define-color headerbar_shade_color rgba(0, 0, 0, 0);

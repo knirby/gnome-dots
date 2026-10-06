@@ -1,0 +1,28 @@
+# Icon and cursor themes. Each is used from the system when present, else
+# from the distribution package (packages.toml), else downloaded from
+# upstream into ~/.local/share/icons.
+
+[[theme]]
+name = "Mint-Y-Grey"
+kind = "icons"
+# Mint-Y-Grey inherits from Mint-Y, so both folders are needed.
+folders = ["Mint-Y", "Mint-Y-Grey"]
+url = "https://github.com/linuxmint/mint-y-icons/archive/refs/tags/1.9.6.tar.gz"
+# folder inside the archive that holds the themes
+prefix = "usr/share/icons"
+size = "about 90 MB"
+
+[[theme]]
+name = "Bibata-Modern-Ice"
+kind = "cursor"
+folders = ["Bibata-Modern-Ice"]
+url = "https://github.com/ful1e5/Bibata_Cursor/releases/latest/download/Bibata-Modern-Ice.tar.xz"
+prefix = ""
+size = "about 3 MB"
+
+# Wallpaper: today's Bing picture is fetched once at install time so the
+# desktop looks right on first login; the Wallpaper Slideshow extension takes
+# over from there.
+[wallpaper]
+market = "ja-JP"
+folder = "Bing Wallpapers"   # inside the user's Pictures folder

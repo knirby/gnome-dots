@@ -1,0 +1,67 @@
+# Apps the configuration points at. Each slot lists alternatives (distro
+# package, Flatpak, other desktops' equivalents); the first one installed
+# wins, and a slot with nothing installed is left out.
+
+# Dock favourites, in order: the core GNOME apps and a web browser only.
+favorites = [
+    ["org.gnome.Nautilus.desktop"],
+    ["org.gnome.Ptyxis.desktop", "app.devsuite.Ptyxis.desktop", "org.gnome.Console.desktop", "org.gnome.Terminal.desktop"],
+    ["org.gnome.SystemMonitor.desktop", "gnome-system-monitor.desktop"],
+    ["org.mozilla.firefox.desktop", "firefox.desktop", "firefox-esr.desktop"],
+]
+
+# ArcMenu pinned apps.
+arcmenu_pinned = [
+    ["org.gnome.Nautilus.desktop"],
+]
+
+# ArcMenu side shortcuts. "@terminal" and "@extensions" are the slots below;
+# "separator" draws a line.
+arcmenu_shortcuts = [
+    "@terminal",
+    "org.gnome.Settings.desktop",
+    "separator",
+    "@extensions",
+    "org.gnome.tweaks.desktop",
+    "menulibre.desktop",
+]
+
+# Terminal for Super+T, Global Menu and ArcMenu: desktop file + command.
+[[terminal]]
+desktop = "org.gnome.Ptyxis.desktop"
+cmd = "ptyxis"
+[[terminal]]
+desktop = "app.devsuite.Ptyxis.desktop"
+cmd = "flatpak run app.devsuite.Ptyxis"
+[[terminal]]
+desktop = "org.gnome.Console.desktop"
+cmd = "kgx"
+[[terminal]]
+desktop = "org.gnome.Terminal.desktop"
+cmd = "gnome-terminal"
+[[terminal]]
+desktop = "kitty.desktop"
+cmd = "kitty"
+[[terminal]]
+desktop = "Alacritty.desktop"
+cmd = "alacritty"
+[[terminal]]
+desktop = "xterm.desktop"
+cmd = "xterm"
+
+# Software centre opened from Global Menu.
+[[software]]
+desktop = "org.gnome.Software.desktop"
+cmd = "gnome-software"
+[[software]]
+desktop = "org.manjaro.pamac.manager.desktop"
+cmd = "pamac-manager"
+[[software]]
+desktop = "io.github.kolunmi.Bazaar.desktop"
+cmd = "flatpak run io.github.kolunmi.Bazaar"
+
+# Extension manager opened from Global Menu and ArcMenu.
+[[extensions]]
+desktop = "com.mattjakeman.ExtensionManager.desktop"
+[[extensions]]
+desktop = "org.gnome.Extensions.desktop"

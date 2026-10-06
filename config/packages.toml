@@ -1,0 +1,127 @@
+# System packages, by role, with their name under each package manager.
+#
+#   required = true   the install stops if it can't be installed
+#   (otherwise)       installed when the repositories carry it, skipped if not
+#
+# A package manager missing from an entry means "not packaged there". Themes
+# that a distribution doesn't package are downloaded from upstream instead
+# (see themes.toml).
+
+[dconf]
+why = "writes the GNOME settings"
+required = true
+apt = "dconf-cli"
+dnf = "dconf"
+pacman = "dconf"
+portage = "gnome-base/dconf"
+xbps = "dconf"
+
+[glib-tools]
+why = "compiles extension settings schemas"
+required = true
+apt = "libglib2.0-bin"
+dnf = "glib2"
+pacman = "glib2"
+portage = "dev-libs/glib"
+xbps = "glib"
+
+[make]
+why = "builds Blur my Shell from its pinned commit"
+required = true
+apt = "make"
+dnf = "make"
+pacman = "make"
+portage = "sys-devel/make"
+xbps = "make"
+
+[gettext]
+why = "builds Blur my Shell's translations"
+required = true
+apt = "gettext"
+dnf = "gettext"
+pacman = "gettext"
+portage = "sys-devel/gettext"
+xbps = "gettext"
+
+[pciutils]
+why = "lets the system monitor name your GPU"
+apt = "pciutils"
+dnf = "pciutils"
+pacman = "pciutils"
+portage = "sys-apps/pciutils"
+xbps = "pciutils"
+
+[libgtop]
+why = "process lists in the system monitor"
+apt = "gir1.2-gtop-2.0"
+dnf = "libgtop2"
+pacman = "libgtop"
+portage = "gnome-base/libgtop"
+xbps = "libgtop"
+
+[font-noto-sans]
+why = "interface font (Noto Sans Medium)"
+apt = "fonts-noto-core"
+dnf = "google-noto-sans-fonts"
+pacman = "noto-fonts"
+portage = "media-fonts/noto"
+xbps = "noto-fonts-ttf"
+
+[font-noto-serif]
+why = "document font (Noto Serif Medium)"
+apt = "fonts-noto-core"
+dnf = "google-noto-serif-fonts"
+pacman = "noto-fonts"
+portage = "media-fonts/noto"
+xbps = "noto-fonts-ttf"
+
+[font-fira-code]
+why = "monospace font (Fira Code)"
+apt = "fonts-firacode"
+dnf = "fira-code-fonts"
+pacman = "ttf-fira-code"
+portage = "media-fonts/fira-code"
+xbps = "font-firacode"
+
+[mint-y-icons]
+why = "Mint-Y-Grey icon theme"
+theme = "Mint-Y-Grey"
+apt = "mint-y-icons"
+dnf = "mint-y-icons"
+
+[bibata-cursor]
+why = "Bibata Modern Ice cursor"
+theme = "Bibata-Modern-Ice"
+apt = "bibata-cursor-theme"
+dnf = "bibata-cursor-themes"
+
+[ptyxis]
+why = "the terminal behind Super+T"
+apt = "ptyxis"
+dnf = "ptyxis"
+pacman = "ptyxis"
+portage = "x11-terms/ptyxis"
+xbps = "ptyxis"
+
+[gnome-tweaks]
+why = "GNOME Tweaks, linked from ArcMenu"
+apt = "gnome-tweaks"
+dnf = "gnome-tweaks"
+pacman = "gnome-tweaks"
+portage = "gnome-extra/gnome-tweaks"
+xbps = "gnome-tweaks"
+
+[extension-manager]
+why = "Extension Manager, linked from ArcMenu and Global Menu"
+apt = "gnome-shell-extension-manager"
+pacman = "extension-manager"
+xbps = "extension-manager"
+
+[extensions-app]
+why = "GNOME Extensions app, where Extension Manager isn't packaged"
+apt = "gnome-shell-extension-prefs"
+dnf = "gnome-extensions-app"
+
+[menulibre]
+why = "menu editor, linked from ArcMenu"
+apt = "menulibre"
