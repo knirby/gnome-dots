@@ -380,6 +380,7 @@ def cmd_uninstall(args) -> int:
         f"remove downloaded themes: {', '.join(st['themes']) or 'none'}",
         "remove the gtk.css block, the Super+T shortcut, the Tux logo, the hourly wallpaper job "
         "and its launcher copies",
+        "remove the file templates it added that you haven't changed",
         f"remove {LAUNCHER}, {APP_DIR} and the PATH lines it added",
     ]
     if restore:
@@ -410,6 +411,7 @@ def cmd_uninstall(args) -> int:
         ("menu-logo", lambda: BY_NAME["menu-logo"].remove(ctx)),
         ("gtk", lambda: BY_NAME["gtk"].remove(ctx)),
         ("app-icons", lambda: BY_NAME["app-icons"].remove(ctx)),
+        ("templates", lambda: BY_NAME["templates"].remove(ctx)),
         ("rounded-blur", lambda: BY_NAME["rounded-blur"].remove(ctx)),
         ("packages", lambda: BY_NAME["packages"].remove(ctx)),
         ("command", lambda: BY_NAME["command"].remove(ctx)),

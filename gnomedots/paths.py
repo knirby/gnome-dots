@@ -50,10 +50,12 @@ def data_dirs() -> list[Path]:
     return out
 
 
-def pictures_dir() -> Path:
-    """The user's Pictures folder, honouring xdg-user-dirs and its translations."""
+def user_dir(name: str) -> Path | None:
+    """An xdg-user-dirs folder (PICTURES, TEMPLATES, ...), honouring its
+    translations, or None when it isn't set (or is set to the home folder,
+    which is how xdg-user-dirs disables one)."""
     try:
-        out = subprocess.run(["xdg-user-dir", "PICTURES"], capture_output=True,
+        out = subprocess.run(["xdg-user-dir", name], capture_output=True,
                              text=True, timeout=5).stdout.strip()
         if out and Path(out) != HOME:
             return Path(out)
@@ -62,11 +64,16 @@ def pictures_dir() -> Path:
     dirs_file = CONFIG_HOME / "user-dirs.dirs"
     try:
         for line in dirs_file.read_text().splitlines():
-            if line.startswith("XDG_PICTURES_DIR="):
+            if line.startswith(f"XDG_{name}_DIR="):
                 value = shlex.split(line.split("=", 1)[1])[0]
                 value = value.replace("$HOME", str(HOME))
                 if Path(value) != HOME:
                     return Path(value)
     except (OSError, IndexError, ValueError):
         pass
-    return HOME / "Pictures"
+    return None
+
+
+def pictures_dir() -> Path:
+    """The user's Pictures folder."""
+    return user_dir("PICTURES") or HOME / "Pictures"

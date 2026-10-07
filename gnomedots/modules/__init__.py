@@ -17,10 +17,11 @@ from .packages import Packages
 from .roundedblur import RoundedBlur
 from .settings import Input, Settings
 from .sysmon import SystemMonitor
+from .templates import Templates
 from .themes import Themes
 from .wallpaper import Wallpaper
 from .zsh import Zsh
 
 ALL = [Packages(), Command(), Themes(), AppIcons(), Extensions(), RoundedBlur(), Wallpaper(),
-       Settings(), Input(), Keybindings(), MenuLogo(), SystemMonitor(), GtkCss(), Zsh()]
+       Settings(), Input(), Keybindings(), MenuLogo(), SystemMonitor(), GtkCss(), Templates(), Zsh()]
 BY_NAME = {m.name: m for m in ALL}

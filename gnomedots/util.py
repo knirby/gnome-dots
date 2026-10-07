@@ -108,13 +108,18 @@ def reachable(url: str, timeout: float = 10) -> bool:
 
 def write_text(path: Path, text: str, mode: int | None = None) -> None:
     """Write a file atomically, honouring dry-run."""
+    write_bytes(path, text.encode("utf-8"), mode)
+
+
+def write_bytes(path: Path, data: bytes, mode: int | None = None) -> None:
+    """Write a file atomically, honouring dry-run."""
     ui.action(f"write {path}")
     if ui.dry_run:
         return
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.")
-    with os.fdopen(fd, "w", encoding="utf-8") as f:
-        f.write(text)
+    with os.fdopen(fd, "wb") as f:
+        f.write(data)
     if mode is not None:
         os.chmod(tmp, mode)
     os.replace(tmp, path)
