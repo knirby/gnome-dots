@@ -53,6 +53,7 @@ class Distro:
     guessed: str | None = None     # family of a package manager found on an unknown distro
     bedrock: bool = False
     stratum: str | None = None     # Bedrock stratum providing gnome-shell
+    root: Path = Path("/")         # where that stratum's files are seen from here
     ostree: bool = False           # image-based (Silverblue, Kinoite...): no dnf installs
 
     @property
@@ -104,6 +105,7 @@ def detect() -> Distro:
             candidate = Path("/bedrock/strata") / d.stratum
             if candidate.is_dir():
                 root = candidate
+    d.root = root
 
     # Bedrock rewrites a hijacked stratum's /etc/os-release; the vendor's copy
     # in /usr/lib keeps the real name.

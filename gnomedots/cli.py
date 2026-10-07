@@ -139,15 +139,14 @@ def show_plan(ctx: Context, modules) -> None:
 
 
 def run_modules(ctx: Context, modules, label: str) -> bool:
-    if "packages" in {m.name for m in modules} and ctx.backend and not ui.dry_run:
-        if BY_NAME["packages"].pending(ctx):
-            ui.info("Installing packages needs root:")
-            if not privilege.warm_up(privilege.prefix() or []):
-                ui.error("Couldn't get root; nothing was changed.")
-                ui.info("On Debian with a root password, your user can't use sudo yet; fix it once with")
-                ui.info(f'  su -c "apt-get install -y sudo && usermod -aG sudo {getpass.getuser()}"')
-                ui.info("then log out and back in, and rerun.")
-                return False
+    if not ui.dry_run and any(m.needs_root(ctx) for m in modules):
+        ui.info("Some steps need root:")
+        if not privilege.warm_up(privilege.prefix() or []):
+            ui.error("Couldn't get root; nothing was changed.")
+            ui.info("On Debian with a root password, your user can't use sudo yet; fix it once with")
+            ui.info(f'  su -c "apt-get install -y sudo && usermod -aG sudo {getpass.getuser()}"')
+            ui.info("then log out and back in, and rerun.")
+            return False
     backed_up = ui.dry_run
     for m in modules:
         # Back up right before the first settings change: after packages,
@@ -330,6 +329,19 @@ def post_update(ctx: Context, reapply: bool) -> int:
     if ext.find("monitor@astraext.github.io"):
         BY_NAME["sysmon"].apply(ctx)
     BY_NAME["command"].apply(ctx)
+    # Recopy launchers from packages that changed, and rebuild the rounded
+    # blur library, with build tools for the new libmutter, after a GNOME
+    # upgrade.
+    steps = ["app-icons"] if "app-icons" in ctx.state["modules"] else []
+    if "rounded-blur" in ctx.state["modules"] and BY_NAME["rounded-blur"].needs_root(ctx):
+        ctx.selected = {"rounded-blur"}
+        steps += ["packages", "rounded-blur"] if ctx.backend else ["rounded-blur"]
+    for name in steps:
+        try:
+            BY_NAME[name].apply(ctx)
+        except Exception as e:
+            ui.error(f"{BY_NAME[name].title}: {e}")
+            ctx.failures.append(name)
     if "wallpaper" in ctx.state["modules"] and dconf.available():
         wallpapers.install_schedule()
 
@@ -366,7 +378,8 @@ def cmd_uninstall(args) -> int:
     plan = [
         f"remove {len(ours)} extensions it installed (ones you had before stay)",
         f"remove downloaded themes: {', '.join(st['themes']) or 'none'}",
-        "remove the gtk.css block, the Super+T shortcut, the Tux logo and the hourly wallpaper job",
+        "remove the gtk.css block, the Super+T shortcut, the Tux logo, the hourly wallpaper job "
+        "and its launcher copies",
         f"remove {LAUNCHER}, {APP_DIR} and the PATH lines it added",
     ]
     if restore:
@@ -375,6 +388,8 @@ def cmd_uninstall(args) -> int:
         plan.insert(0, "keep the current settings" + ("" if initial else " (no pre-install backup found)"))
     if st.get("zsh"):
         plan.append("put back your previous .zshrc and remove the Oh My Zsh it installed")
+    if st.get("rounded_blur"):
+        plan.append("remove the GNOME Rounded Blur library it built")
     if st["packages_added"]:
         plan.append("offer to remove the packages it installed")
     ui.bullet_list(plan)
@@ -394,6 +409,8 @@ def cmd_uninstall(args) -> int:
         ("themes", lambda: BY_NAME["themes"].remove(ctx)),
         ("menu-logo", lambda: BY_NAME["menu-logo"].remove(ctx)),
         ("gtk", lambda: BY_NAME["gtk"].remove(ctx)),
+        ("app-icons", lambda: BY_NAME["app-icons"].remove(ctx)),
+        ("rounded-blur", lambda: BY_NAME["rounded-blur"].remove(ctx)),
         ("packages", lambda: BY_NAME["packages"].remove(ctx)),
         ("command", lambda: BY_NAME["command"].remove(ctx)),
     ]

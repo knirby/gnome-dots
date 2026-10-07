@@ -15,7 +15,7 @@ _EXTRA = [HOME / ".local/share/flatpak/exports/share", Path("/var/lib/flatpak/ex
           Path("/var/lib/snapd/desktop")]
 
 
-def _app_dirs() -> list[Path]:
+def app_dirs() -> list[Path]:
     dirs = []
     for base in [*data_dirs(), *_EXTRA]:
         d = base / "applications"
@@ -27,7 +27,7 @@ def _app_dirs() -> list[Path]:
 def installed(desktop_id: str) -> bool:
     # Desktop IDs map "-" to subdirectories as a fallback (kde-foo.desktop -> kde/foo.desktop).
     alt = desktop_id.replace("-", "/", 1)
-    return any((d / desktop_id).is_file() or (d / alt).is_file() for d in _app_dirs())
+    return any((d / desktop_id).is_file() or (d / alt).is_file() for d in app_dirs())
 
 
 def _runnable(cmd: str | None) -> bool:

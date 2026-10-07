@@ -65,3 +65,10 @@ cmd = "flatpak run io.github.kolunmi.Bazaar"
 desktop = "com.mattjakeman.ExtensionManager.desktop"
 [[extensions]]
 desktop = "org.gnome.Extensions.desktop"
+
+# Launcher icons swapped for Mint-Y-Grey ones, which Mint-Y doesn't apply to
+# these apps by itself: desktop file -> icon name.
+[icons]
+"org.gnome.Nautilus.desktop" = "file-manager"
+"org.gnome.Ptyxis.desktop" = "utilities-terminal"
+"app.devsuite.Ptyxis.desktop" = "utilities-terminal"

@@ -51,7 +51,9 @@ On [Bedrock Linux](https://bedrocklinux.org), packages go to the stratum that pr
 | --- | --- |
 | `packages` | Noto Sans/Serif and Fira Code fonts, Ptyxis, GNOME Tweaks, dconf and the build tools, from your repositories |
 | `themes` | Mint-Y-Grey icons and Bibata Modern Ice; downloaded from upstream into `~/.local/share/icons` where the distribution doesn't package them |
+| `app-icons` | Files shows the Mint-Y-Grey folder and Ptyxis the Mint-Y terminal, through copies of their launchers in `~/.local/share/applications` that change only the icon; a launcher you edited yourself is left alone |
 | `extensions` | 18 extensions (below), built for your GNOME version; conflicting ones (Ubuntu Dock, Dash to Panel, ...) are disabled, never removed |
+| `rounded-blur` | the [GNOME Rounded Blur](https://github.com/kancko/gnome-rounded-blur) library Blur my Shell needs for rounded corners on its blur, built for your GNOME and installed to `/usr` (skipped when it's already installed); `update` rebuilds it after a GNOME upgrade |
 | `wallpaper` | today's Bing picture right away, then each new one as it comes out, shown once on arrival; Wallpaper Slideshow cycles them every 10 minutes and old ones are kept up to 200 MB (details below) |
 | `settings` | theme, fonts, clock, windows, workspaces, the dock favourites, and every extension's configuration |
 | `input` | flat mouse acceleration and speed, num lock on; keyboard layouts are left alone |
@@ -112,7 +114,7 @@ knirby-gnomedots version
 
 `update` pulls the latest version of this repository, updates the extensions and re-detects the hardware. When the new version changes the configuration, it asks before re-applying it, and backs up your settings first. `--check` only reports whether an update exists.
 
-`uninstall` removes the extensions it installed (ones you already had stay), the themes it downloaded, the hourly wallpaper check, its file blocks, the zsh addon (putting your old `.zshrc` back), the command and its copy of the repository. Downloaded wallpapers stay. It then puts back every setting it changed from the backup taken before the first install, unless you pass `--keep-settings`. It offers to remove the packages it installed, but never removes them unasked. Backups stay in `~/.local/state/knirby-gnomedots/backups`.
+`uninstall` removes the extensions it installed (ones you already had stay), the themes it downloaded, the hourly wallpaper check, its file blocks and launcher copies, the Rounded Blur library it built, the zsh addon (putting your old `.zshrc` back), the command and its copy of the repository. Downloaded wallpapers stay. It then puts back every setting it changed from the backup taken before the first install, unless you pass `--keep-settings`. It offers to remove the packages it installed, but never removes them unasked. Backups stay in `~/.local/state/knirby-gnomedots/backups`.
 
 Every command accepts `--yes` to skip the questions, `--dry-run` to change nothing and `--verbose` to show each step. The log of the last run is at `~/.local/state/knirby-gnomedots/last-run.log` (`knirby-gnomedots status --log`).
 

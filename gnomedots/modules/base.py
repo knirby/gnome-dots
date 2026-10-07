@@ -11,6 +11,16 @@ class Module:
     needs_network = False
     default = True           # False: opt-in addon, only run when asked for
 
+    def needs_root(self, ctx: Context) -> bool:
+        """Whether apply() will run something as root, so the password is
+        asked for once, up front."""
+        return False
+
+    def wants_packages(self, ctx: Context) -> bool:
+        """Whether this run needs the packages tied to this module in
+        packages.toml (`module = ...`)."""
+        return True
+
     def plan(self, ctx: Context) -> list[str]:
         """What apply() would change, one line per item, for the confirmation."""
         return []

@@ -75,6 +75,11 @@ class Context:
     def shell_major(self) -> int:
         return self.shell_version[0] if self.shell_version else 0
 
+    @property
+    def mutter_api(self) -> int:
+        """libmutter's API number: 16 for GNOME 48, 18 for GNOME 50."""
+        return self.shell_major - 32
+
     @cached_property
     def backend(self) -> Backend | None:
         family = self.distro.family or (self.distro.guessed if self.allow_untested_pm else None)

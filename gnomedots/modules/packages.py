@@ -9,6 +9,11 @@ REQUIRED_COMMANDS = {"dconf": "dconf", "glib-tools": "glib-compile-schemas",
                      "make": "make", "gettext": "msgfmt"}
 
 
+def _module_needs(ctx, name: str) -> bool:
+    from . import BY_NAME  # the registry imports this module
+    return name in ctx.selected and BY_NAME[name].wants_packages(ctx)
+
+
 class Packages(Module):
     name = "packages"
     title = "System packages"
@@ -23,11 +28,11 @@ class Packages(Module):
         family = backend.family if backend else None
         entries = []
         for role, entry in ctx.packages_config.items():
-            if entry.get("module") and entry["module"] not in ctx.selected:
+            if entry.get("module") and not _module_needs(ctx, entry["module"]):
                 continue
             if entry.get("theme") and theme_present(entry["theme"]):
                 continue
-            pkg = entry.get(family) if family else None
+            pkg = entry.get(family, "").format(mutter=ctx.mutter_api) if family else None
             if not pkg:
                 if entry.get("required") and not util.which(REQUIRED_COMMANDS.get(role, role)):
                     plan["missing_required"].append(role)
@@ -53,6 +58,9 @@ class Packages(Module):
     def pending(self, ctx) -> list[str]:
         """Packages apply() would install."""
         return [p for p, _ in self._plan(ctx)["install"]] if ctx.backend else []
+
+    def needs_root(self, ctx):
+        return bool(self.pending(ctx))
 
     def plan(self, ctx):
         if not ctx.backend:

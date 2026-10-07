@@ -3,7 +3,8 @@
 #   required = true   the install stops if it can't be installed
 #   (otherwise)       installed when the repositories carry it, skipped if not
 #
-# A package manager missing from an entry means "not packaged there".
+# A package manager missing from an entry means "not packaged there", and
+# {mutter} stands for libmutter's API number (16 on GNOME 48, 18 on GNOME 50).
 # `module` ties a package to an opt-in addon: installed only with that addon. Themes
 # that a distribution doesn't package are downloaded from upstream instead
 # (see themes.toml).
@@ -144,3 +145,63 @@ dnf = "git"
 pacman = "git"
 portage = "dev-vcs/git"
 xbps = "git"
+
+# Building the GNOME Rounded Blur library (the rounded-blur module).
+[rb-compiler]
+why = "builds the GNOME Rounded Blur library"
+module = "rounded-blur"
+apt = "build-essential"
+dnf = "gcc"
+pacman = "gcc"
+portage = "sys-devel/gcc"
+xbps = "gcc"
+
+[rb-meson]
+why = "builds the GNOME Rounded Blur library"
+module = "rounded-blur"
+apt = "meson"
+dnf = "meson"
+pacman = "meson"
+portage = "dev-build/meson"
+xbps = "meson"
+
+[rb-pkgconf]
+why = "builds the GNOME Rounded Blur library"
+module = "rounded-blur"
+apt = "pkgconf"
+dnf = "pkgconf-pkg-config"
+pacman = "pkgconf"
+portage = "dev-util/pkgconf"
+xbps = "pkgconf"
+
+[rb-glib]
+why = "GLib headers for the GNOME Rounded Blur library"
+module = "rounded-blur"
+apt = "libglib2.0-dev"
+dnf = "glib2-devel"
+pacman = "glib2"
+portage = "dev-libs/glib"
+xbps = "glib-devel"
+
+[rb-introspection]
+why = "makes the GNOME Rounded Blur library usable from GNOME Shell"
+module = "rounded-blur"
+apt = "gobject-introspection"
+dnf = "gobject-introspection-devel"
+pacman = "gobject-introspection"
+portage = "dev-libs/gobject-introspection"
+xbps = "gobject-introspection"
+
+[rb-introspection-dev]
+why = "makes the GNOME Rounded Blur library usable from GNOME Shell"
+module = "rounded-blur"
+apt = "libgirepository1.0-dev"
+
+[rb-mutter]
+why = "Mutter headers the GNOME Rounded Blur library is built against"
+module = "rounded-blur"
+apt = "libmutter-{mutter}-dev"
+dnf = "mutter-devel"
+pacman = "mutter"
+portage = "x11-wm/mutter"
+xbps = "mutter-devel"

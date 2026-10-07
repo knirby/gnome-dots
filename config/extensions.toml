@@ -144,6 +144,12 @@ source = "github"
 repo = "knirby/super-scroll-zoom"
 branches = ["main", "gnome-46-49"]   # main: GNOME 50+
 
+# The library behind Blur my Shell's rounded corners on dynamic blur, built
+# for this machine's Mutter by the rounded-blur module.
+[rounded-blur]
+repo = "kancko/gnome-rounded-blur"
+commit = "f3bfcc796e1214c1e1d4287ee35cb132ad8133f0"
+
 # Extensions that fight the ones above; disabled (never removed) if present.
 [conflicts]
 uuids = [
