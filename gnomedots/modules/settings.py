@@ -1,13 +1,23 @@
 """The desktop configuration itself: dconf templates for GNOME, its apps and
 every extension, filled in with this machine's values."""
 
-from .. import ui
-from ..gnome import apps, dconf
+from .. import ui, util
+from ..gnome import apps, dconf, gvariant
 from ..gnome import extensions as ext
 from .base import Module
 from .wallpaper import resolution
 
 SEPARATOR = {"name": "Separator", "icon": "list-remove-symbolic", "id": "ArcMenu_Separator"}
+FAVORITES = "/org/gnome/shell/favorite-apps"
+
+
+def current_favorites() -> list[str]:
+    """The dock favourites as GNOME shows them now, its defaults included
+    when they were never changed."""
+    text = dconf.read(FAVORITES)
+    if text is None:
+        text = util.output(["gsettings", "get", "org.gnome.shell", "favorite-apps"])
+    return gvariant.load_strv(text)
 
 
 def template_values(ctx) -> dict:
@@ -85,9 +95,18 @@ class Settings(Module):
         for e in ctx.extensions:
             if e.get("settings") and not load_templates(ctx, [f"extensions/{e['settings']}"], e["dconf"]):
                 failed.append(e["name"])
-        favorites = [a for a in (apps.first_installed(slot) for slot in ctx.apps_config["favorites"]) if a]
-        if favorites:
-            dconf.write("/org/gnome/shell/favorite-apps", favorites)
+        # The dock keeps what you already pinned and missing favourites go after
+        # it, each only once: one you unpin later stays unpinned.
+        current = current_favorites()
+        added = ctx.state["favorites_added"]
+        missing = []
+        for slot in ctx.apps_config["favorites"]:
+            app = apps.first_installed(slot)
+            if app and app not in added and not any(a in current for a in slot):
+                missing.append(app)
+        ctx.state.add_unique("favorites_added", *missing)
+        if missing:
+            dconf.write(FAVORITES, current + missing)
             ctx.state.add_unique("dconf_sections", "/org/gnome/shell/")
         if failed:
             ctx.failures.append("settings: " + ", ".join(failed))

@@ -55,7 +55,7 @@ On [Bedrock Linux](https://bedrocklinux.org), packages go to the stratum that pr
 | `extensions` | 18 extensions (below), built for your GNOME version; conflicting ones (Ubuntu Dock, Dash to Panel, ...) are disabled, never removed |
 | `rounded-blur` | the [GNOME Rounded Blur](https://github.com/kancko/gnome-rounded-blur) library Blur my Shell needs for rounded corners on its blur, built for your GNOME and installed to `/usr` (skipped when it's already installed); `update` rebuilds it after a GNOME upgrade |
 | `wallpaper` | today's Bing picture right away, then each new one as it comes out, shown once on arrival; Wallpaper Slideshow cycles them every 10 minutes and old ones are kept up to 200 MB (details below) |
-| `settings` | theme, fonts, clock, windows, workspaces, the dock favourites, and every extension's configuration |
+| `settings` | theme, fonts, clock, windows, workspaces, every extension's configuration, and the dock favourites, added after the apps you already have pinned (each once, so one you unpin stays off) |
 | `input` | flat mouse acceleration and speed, num lock on; keyboard layouts are left alone |
 | `keybindings` | the shortcuts below |
 | `menu-logo` | your distribution's logo on the ArcMenu button, Tux when ArcMenu has none |

@@ -23,6 +23,7 @@ class State:
         d.setdefault("themes", {})           # theme name -> path it downloaded to
         d.setdefault("edited_files", [])     # files holding a marked block
         d.setdefault("templates", {})        # template path -> sha256 of what it wrote
+        d.setdefault("favorites_added", [])  # dock favourites it pinned
         d.setdefault("dconf_sections", [])   # dconf dirs it wrote, shallow
         d.setdefault("dconf_trees", [])      # dconf dirs it reset and wrote, recursive
         d.setdefault("modules", [])          # modules applied at least once

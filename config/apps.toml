@@ -2,7 +2,9 @@
 # package, Flatpak, other desktops' equivalents); the first one installed
 # wins, and a slot with nothing installed is left out.
 
-# Dock favourites, in order: the core GNOME apps and a web browser only.
+# Dock favourites, in order: the core GNOME apps and a web browser only. They
+# are added after what the dock already holds; a slot with any of its
+# alternatives pinned is skipped.
 favorites = [
     ["org.gnome.Nautilus.desktop"],
     ["org.gnome.Ptyxis.desktop", "app.devsuite.Ptyxis.desktop", "org.gnome.Console.desktop", "org.gnome.Terminal.desktop"],
