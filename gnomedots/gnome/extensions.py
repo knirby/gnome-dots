@@ -106,6 +106,12 @@ def install_zip(data: bytes, uuid: str) -> None:
         try:
             _safe_members(zf.namelist(), staged)
             zf.extractall(staged)
+            # zipfile drops Unix modes; Desktop Icons NG, for one, runs a
+            # script from its folder and fails with "Permission denied".
+            for info in zf.infolist():
+                mode = info.external_attr >> 16 & 0o777
+                if mode and not info.is_dir():
+                    (staged / info.filename).chmod(mode)
             _compile_schemas(staged)
         except Exception:
             shutil.rmtree(staged, ignore_errors=True)

@@ -41,8 +41,12 @@ class Extensions(Module):
                 if e.get("pin_version") and current == e["pin_version"]:
                     # pinned: the metadata says 9999, the state knows what's really there
                     current = ctx.state["extensions"].get(uuid, {}).get("version")
+                # Copies an older version unpacked lost their file modes;
+                # reinstall those once.
+                record = ctx.state["extensions"].get(uuid, {})
+                stale = record and not record.get("preexisting") and not record.get("modes")
                 row["action"] = ("unavailable" if not info else
-                                 "ok" if row["user_copy"] and current == row["want"] else
+                                 "ok" if row["user_copy"] and current == row["want"] and not stale else
                                  "update" if row["user_copy"] else "install")
             else:
                 head = github_ref(e, ctx.shell_major)
@@ -87,6 +91,7 @@ class Extensions(Module):
             try:
                 if e["source"] == "ego":
                     record["version"] = ext.install_from_ego(uuid, ctx.shell_major, r["info"])
+                    record["modes"] = True
                 else:
                     ext.install_from_github(uuid, e["repo"], r["want"], e.get("build"), e.get("artifact"))
                     record["version"] = r["want"]
