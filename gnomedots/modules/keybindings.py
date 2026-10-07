@@ -27,7 +27,7 @@ class Keybindings(Module):
         return [
             "Super+X close, Super+Up/Down maximise/minimise, Super+Left/Right workspaces",
             "Super+1-4 workspaces, Super+E files, Super+S search, Super+D desktop, Super+A apps",
-            "Shift+Super+S screenshot, Ctrl+Super+Space next layout, Super+, settings",
+            "Shift+Super+S or Shift+Print screenshot, Ctrl+Super+S or Print screenshot tool, Ctrl+Super+Space next layout, Super+, settings",
             "Super+T terminal, Super+M menu, Super+V clipboard, Super+Space launcher",
         ]
 

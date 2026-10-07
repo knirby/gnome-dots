@@ -92,7 +92,8 @@ The accent colour comes from Auto Accent Colour, which picks it from each wallpa
 | Super+R | run a command |
 | Super+N | notifications |
 | Super+, | Settings |
-| Shift+Super+S, Ctrl+Super+S | screenshot, screenshot tool |
+| Shift+Super+S or Shift+Print | screenshot of the whole screen |
+| Ctrl+Super+S or Print | screenshot tool (pick an area) |
 | Ctrl+Super+Space | next keyboard layout |
 | Super+scroll, Super+0 | zoom, reset zoom |
 
