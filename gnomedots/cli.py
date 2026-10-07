@@ -1,6 +1,7 @@
 """knirby-gnomedots: install, update, inspect and remove the setup."""
 
 import argparse
+import getpass
 import io
 import json
 import os
@@ -10,7 +11,7 @@ import tarfile
 import tempfile
 from pathlib import Path
 
-from . import APP_NAME, BRANCH, REPO, SUPPORTED_SHELL, __version__, hardware, ui, util, wallpapers
+from . import APP_NAME, BRANCH, MIN_SHELL, REPO, SUPPORTED_SHELL, __version__, hardware, ui, util, wallpapers
 from .context import Context, Options
 from .gnome import dconf
 from .gnome import extensions as ext
@@ -60,8 +61,11 @@ def preflight(ctx: Context, modules) -> bool:
         ui.warn(f"GNOME Shell {v[0]}.{v[1]} is newer than this setup is tested with ({max(SUPPORTED_SHELL)}).")
         if not ctx.options.force and not ui.confirm("Continue anyway?", False):
             return False
+    elif v[0] >= MIN_SHELL:
+        ui.warn(f"GNOME Shell {v[0]}.{v[1]}: this setup is built for {max(SUPPORTED_SHELL)}; "
+                "extensions without a build for your version are skipped.")
     else:
-        ui.error(f"GNOME Shell {v[0]}.{v[1]} is too old; this setup targets GNOME {max(SUPPORTED_SHELL)}.")
+        ui.error(f"GNOME Shell {v[0]}.{v[1]} is too old; this setup needs GNOME {MIN_SHELL} or newer.")
         if not ctx.options.force:
             ui.info("Use --force to try anyway (extensions may be missing).")
             return False
@@ -135,21 +139,29 @@ def show_plan(ctx: Context, modules) -> None:
 
 
 def run_modules(ctx: Context, modules, label: str) -> bool:
-    if any(m.needs_dconf for m in modules) and not ui.dry_run:
-        folder = dconf.backup(label)
-        if not folder:
-            ui.error("Backup failed; nothing was changed.")
-            return False
-        ui.ok(f"Settings backed up to {folder}")
-        if not ctx.state["initial_backup"]:
-            ctx.state["initial_backup"] = str(folder)
     if "packages" in {m.name for m in modules} and ctx.backend and not ui.dry_run:
         if BY_NAME["packages"].pending(ctx):
             ui.info("Installing packages needs root:")
             if not privilege.warm_up(privilege.prefix() or []):
-                ui.error("Couldn't get root; nothing was installed.")
+                ui.error("Couldn't get root; nothing was changed.")
+                ui.info("On Debian with a root password, your user can't use sudo yet; fix it once with")
+                ui.info(f'  su -c "apt-get install -y sudo && usermod -aG sudo {getpass.getuser()}"')
+                ui.info("then log out and back in, and rerun.")
                 return False
+    backed_up = ui.dry_run
     for m in modules:
+        # Back up right before the first settings change: after packages,
+        # which may be what installs dconf.
+        if m.needs_dconf and not backed_up:
+            folder = dconf.backup(label)
+            if not folder:
+                ui.error("Couldn't back up the current settings, so none were changed; rerunning is safe.")
+                ctx.state.save()
+                return False
+            ui.ok(f"Settings backed up to {folder}")
+            if not ctx.state["initial_backup"]:
+                ctx.state["initial_backup"] = str(folder)
+            backed_up = True
         ui.header(m.title)
         try:
             m.apply(ctx)
@@ -371,7 +383,8 @@ def cmd_uninstall(args) -> int:
         return 1
     if dconf.available() and session.has_session_bus():
         folder = dconf.backup("before-uninstall")
-        ui.ok(f"Current settings backed up to {folder}")
+        if folder:
+            ui.ok(f"Current settings backed up to {folder}")
     steps = [
         ("extensions", lambda: BY_NAME["extensions"].remove(ctx)),
         ("wallpaper", lambda: BY_NAME["wallpaper"].remove(ctx)),
@@ -463,6 +476,8 @@ def cmd_detect(args) -> int:
 def cmd_backup(args) -> int:
     make_context(args)
     folder = dconf.backup("manual")
+    if not folder:
+        return 1
     ui.ok(f"Backed up to {folder}")
     return 0
 
@@ -494,7 +509,8 @@ def cmd_restore(args) -> int:
     ui.info(f"This puts back every setting {APP_NAME} manages as it was in {folder.name}.")
     if not ui.confirm("Restore?", False):
         return 1
-    dconf.backup("before-restore")
+    if not dconf.backup("before-restore"):
+        return 1
     if dconf.restore(folder, st["dconf_sections"], st["dconf_trees"]):
         ui.ok("Restored")
         session.offer_restart("Some changes only show after logging in again")

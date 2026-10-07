@@ -138,6 +138,20 @@ def github_head(repo: str, branch: str) -> str | None:
         return None
 
 
+def github_metadata(repo: str, ref: str) -> dict | None:
+    try:
+        return util.http_json(f"https://raw.githubusercontent.com/{repo}/{ref}/metadata.json")
+    except Exception as e:
+        ui.detail(f"{repo}@{ref[:8]}: {e}")
+        return None
+
+
+def supports(meta: dict | None, shell_major: int) -> bool:
+    """Whether an extension's metadata.json lists this GNOME Shell major."""
+    versions = (meta or {}).get("shell-version", [])
+    return str(shell_major) in {str(v).split(".")[0] for v in versions}
+
+
 def _extract_all(tf: tarfile.TarFile, dest: Path, members=None) -> None:
     try:
         tf.extractall(dest, members=members, filter="data")

@@ -67,10 +67,6 @@ def load(text: str, root: str = "/") -> bool:
     return proc.returncode == 0
 
 
-def dump(path: str = "/") -> str:
-    return util.output(["dconf", "dump", path]) or ""
-
-
 def read(key: str) -> str | None:
     out = util.output(["dconf", "read", key])
     return out.strip() if out and out.strip() else None
@@ -96,12 +92,14 @@ def reset_shallow(path: str) -> None:
 # -- backups ---------------------------------------------------------------
 
 def backup(label: str = "manual") -> Path | None:
-    """Dump the whole database to a timestamped backup folder."""
+    """Dump the whole database to a timestamped backup folder; None if dconf
+    can't read it."""
     name = time.strftime("%Y%m%d-%H%M%S") + f"-{label}"
     folder = BACKUP_DIR / name
-    text = dump("/")
-    if not text.strip():
-        ui.warn("dconf returned nothing to back up (empty database?)")
+    text = util.output(["dconf", "dump", "/"])
+    if text is None:
+        ui.error("dconf couldn't read the settings database")
+        return None
     ui.action(f"back up dconf to {folder}")
     if ui.dry_run:
         return folder

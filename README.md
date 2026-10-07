@@ -1,13 +1,25 @@
 # gnome-dots
 
-knirby's GNOME desktop in one command: dark Adwaita with an accent colour that follows the wallpaper, Mint-Y-Grey icons, the Bibata Modern Ice cursor, frosted blur everywhere, rounded windows, ArcMenu with your distribution's logo, a system monitor in the top bar, a bottom dock and a new Bing wallpaper every day. It's written in Python, so it works the same from bash, zsh or fish, on any of the supported distributions. Built for GNOME 50. Licensed under GPL-3.0-only; see [LICENSE](LICENSE).
+knirby's GNOME desktop in one command: dark Adwaita with an accent colour that follows the wallpaper, Mint-Y-Grey icons, the Bibata Modern Ice cursor, frosted blur everywhere, rounded windows, ArcMenu with your distribution's logo, a system monitor in the top bar, a bottom dock and a new Bing wallpaper every day. It's written in Python, so it works the same from bash, zsh or fish, on any of the supported distributions. Built for GNOME 50, and runs on GNOME 46 and newer. Licensed under GPL-3.0-only; see [LICENSE](LICENSE).
 
 ![The desktop over a Bing picture of a mossy forest](docs/preview-forest.webp)
 ![The same desktop over penguins on snow: the accent colour has followed the wallpaper](docs/preview-penguins.webp)
 
 ## Install
 
-From a terminal inside your GNOME session, as your normal user:
+From a terminal inside your GNOME session, as your normal user. On a fresh Debian, first make sure `sudo true` works and git is there:
+
+```sh
+sudo apt install git
+```
+
+If sudo isn't there or refuses you (you gave root a password while installing Debian), run this instead, then log out and back in:
+
+```sh
+su -c "apt-get install -y git sudo && usermod -aG sudo $USER"
+```
+
+Then:
 
 ```sh
 git clone https://github.com/knirby/gnome-dots.git
@@ -29,7 +41,7 @@ The clone can be deleted afterwards: the install copies itself to `~/.local/shar
 | Gentoo | emerge | Gentoo, Funtoo, Calculate |
 | Void | xbps | Void |
 
-GNOME Shell 50 is required. Newer versions run after a warning; older ones are refused unless you pass `--force`.
+GNOME Shell 50 is what it's built and tested for, such as Debian testing or Fedora 44. GNOME 46 to 49 also work, such as Debian 13 (GNOME 48) or Ubuntu 24.04 (GNOME 46): the installer warns, then installs every extension built for that version and skips any that isn't. Newer versions run after a warning; versions older than 46 are refused unless you pass `--force`.
 
 On [Bedrock Linux](https://bedrocklinux.org), packages go to the stratum that provides gnome-shell, and the ArcMenu button shows the Bedrock logo from [brl-tools](https://github.com/knirby/brl-tools) when it's installed. On other distributions that use one of the package managers above, the installer asks before using it. On anything else, and on image-based systems such as Silverblue, it skips packages and applies everything else. Slackware isn't supported: GNOME isn't in its official tree.
 
@@ -56,7 +68,7 @@ The accent colour comes from Auto Accent Colour, which picks it from each wallpa
 
 **Bing wallpapers.** Wallpaper Slideshow's own downloader refetches 12 hours after its last fetch, timed on a clock that stops during suspend and restarts at every login, so a machine that sleeps a lot can go days without a new picture. The setup adds an hourly check: a systemd user timer that also catches up after suspend, or a check that starts at login where systemd doesn't manage user services. It fetches the newest pictures under the same names the extension uses, switches to each day's picture once when it arrives, and falls back to 1920x1080 where Bing doesn't publish the chosen size. Pictures stay in `~/Pictures/Bing Wallpapers` until the folder passes 200 MB (`keep_mb` in [config/themes.toml](config/themes.toml)); then the oldest are deleted, never the one on screen.
 
-**Extensions:** ArcMenu, Blur my Shell, Dash to Dock, Just Perfection, Astra Monitor, Wallpaper Slideshow, Auto Accent Colour, Rounded Window Corners Reborn, Global Menu, Medialine, Clipboard Indicator, Lightning Launcher, Desktop Icons NG, GNOME UI Tune, Unlock Dialog Background, AppIndicator Support, Removable Drive Menu and [Super Scroll Zoom](https://github.com/knirby/super-scroll-zoom). They come from extensions.gnome.org, except Super Scroll Zoom, which comes from its GitHub repository, and Blur my Shell, which is built from upstream commit `99660f4` instead of the extensions.gnome.org release. Its version is set to 9999, so GNOME's automatic updates and Extension Manager leave it alone.
+**Extensions:** ArcMenu, Blur my Shell, Dash to Dock, Just Perfection, Astra Monitor, Wallpaper Slideshow, Auto Accent Colour, Rounded Window Corners Reborn, Global Menu, Medialine, Clipboard Indicator, Lightning Launcher, Desktop Icons NG, GNOME UI Tune, Unlock Dialog Background, AppIndicator Support, Removable Drive Menu and [Super Scroll Zoom](https://github.com/knirby/super-scroll-zoom). They come from extensions.gnome.org, built for your GNOME version, except Super Scroll Zoom, which comes from its GitHub repository (`main` for GNOME 50 and newer, the `gnome-46-49` branch before that), and Blur my Shell, which is built from upstream commit `99660f4` instead of the extensions.gnome.org release. Its version is set to 9999, so GNOME's automatic updates and Extension Manager leave it alone.
 
 **Shortcuts:**
 

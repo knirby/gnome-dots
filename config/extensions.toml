@@ -1,16 +1,20 @@
 # GNOME Shell extensions, in the order they're installed.
 #
 #   source = "ego"      extensions.gnome.org, the build for the running GNOME
-#   source = "github"   a GitHub repository: the head of `branch`, or exactly
-#                       `commit` when pinned; `build` is run in the checkout
-#                       and `artifact` is the zip it produces (without `build`
-#                       the repository root is the extension)
+#   source = "github"   a GitHub repository: exactly `commit` when pinned, else
+#                       the head of the first of `branches` (default main)
+#                       whose metadata.json lists the running GNOME; `build`
+#                       is run in the checkout and `artifact` is the zip it
+#                       produces (without `build` the repository root is the
+#                       extension)
 #   settings            dconf template in dconf/extensions/ (reset, then loaded)
 #   dconf               the extension's settings folder
 #   pin_version         stamp this version into metadata.json after installing,
 #                       so GNOME's automatic updates and Extension Manager never
 #                       replace the build; `knirby-gnomedots update` still
 #                       upgrades it, tracking the real version on its own
+#
+# An extension with no build for the running GNOME is skipped, never forced.
 
 [[extension]]
 uuid = "arcmenu@arcmenu.com"
@@ -138,7 +142,7 @@ uuid = "super-scroll-zoom@knirby.github.io"
 name = "Super Scroll Zoom"
 source = "github"
 repo = "knirby/super-scroll-zoom"
-branch = "main"
+branches = ["main", "gnome-46-49"]   # main: GNOME 50+
 
 # Extensions that fight the ones above; disabled (never removed) if present.
 [conflicts]

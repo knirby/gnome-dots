@@ -7,6 +7,16 @@ from ..gnome import extensions as ext
 from .base import Module
 
 
+def github_ref(e: dict, shell_major: int) -> str | None:
+    """The pinned commit, else the head of the first listed branch, whose
+    metadata.json supports this GNOME Shell; None when none does."""
+    for ref in [e["commit"]] if e.get("commit") else e.get("branches", ["main"]):
+        sha = ref if e.get("commit") else ext.github_head(e["repo"], ref)
+        if sha and ext.supports(ext.github_metadata(e["repo"], sha), shell_major):
+            return sha
+    return None
+
+
 class Extensions(Module):
     name = "extensions"
     title = "GNOME Shell extensions"
@@ -35,7 +45,7 @@ class Extensions(Module):
                                  "ok" if row["user_copy"] and current == row["want"] else
                                  "update" if row["user_copy"] else "install")
             else:
-                head = e.get("commit") or ext.github_head(e["repo"], e.get("branch", "main"))
+                head = github_ref(e, ctx.shell_major)
                 row["want"] = head
                 known = ctx.state["extensions"].get(uuid, {}).get("version")
                 row["action"] = ("unavailable" if not head else

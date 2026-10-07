@@ -45,6 +45,9 @@ class Backend:
 
 class Apt(Backend):
     family, name = "apt", "apt"
+    # Wait for the dpkg lock instead of failing: right after a fresh install,
+    # PackageKit often holds it for a while.
+    LOCK = ["-o", "DPkg::Lock::Timeout=600"]
 
     def is_installed(self, pkg):
         out = util.output([*self.strat, "dpkg-query", "-W", "-f=${Status}", pkg]) or ""
@@ -61,14 +64,14 @@ class Apt(Backend):
         if self.refreshed:
             return True
         self.refreshed = True
-        return util.run([*self.root, "apt-get", "update"], mutate=True, capture=False).returncode == 0
+        return util.run([*self.root, "apt-get", *self.LOCK, "update"], mutate=True, capture=False).returncode == 0
 
     def install(self, pkgs):
         return util.run([*self.root, "env", "DEBIAN_FRONTEND=noninteractive",
-                         "apt-get", "install", "-y", *pkgs], mutate=True, capture=False).returncode == 0
+                         "apt-get", *self.LOCK, "install", "-y", *pkgs], mutate=True, capture=False).returncode == 0
 
     def remove(self, pkgs):
-        return util.run([*self.root, "apt-get", "remove", "-y", *pkgs],
+        return util.run([*self.root, "apt-get", *self.LOCK, "remove", "-y", *pkgs],
                         mutate=True, capture=False).returncode == 0
 
 

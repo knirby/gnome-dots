@@ -18,7 +18,9 @@ def prefix() -> list[str] | None:
 
 
 def warm_up(pre: list[str]) -> bool:
-    """Ask for the password once, up front, rather than mid-install."""
-    if pre == ["sudo"]:
-        return util.run(["sudo", "-v"], capture=False).returncode == 0
-    return True
+    """Ask for the password once, up front, rather than mid-install; False
+    when root can't be had."""
+    if not pre:
+        return True
+    cmd = ["sudo", "-v"] if pre == ["sudo"] else [*pre, "true"]
+    return util.run(cmd, capture=False).returncode == 0
