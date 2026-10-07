@@ -123,6 +123,20 @@ def choose(question: str, options: list[tuple[str, str]], default: str) -> str:
             return reply
 
 
+def confirm_backup(question: str, default: bool = True) -> bool | None:
+    """Ask before a change to the settings, offering to back them up first.
+    True: go ahead with a backup, False: go ahead without one, None: cancel.
+    The default is the backup when default is True, cancelling otherwise;
+    --yes always takes the backup."""
+    if assume_yes:
+        log(f"?? {question} -> yes, with a backup (--yes)")
+        return True
+    reply = choose(question, [("y", "yes, back up my settings first"),
+                              ("s", "yes, skip the backup"),
+                              ("c", "cancel")], "y" if default else "c")
+    return {"y": True, "s": False}.get(reply)
+
+
 def bullet_list(items, indent: str = "    ") -> None:
     for item in items:
         _out("  ", "", f"{indent}• {item}")

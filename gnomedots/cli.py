@@ -138,7 +138,9 @@ def show_plan(ctx: Context, modules) -> None:
             ui.warn(f"couldn't work out the plan: {e}")
 
 
-def run_modules(ctx: Context, modules, label: str) -> bool:
+def run_modules(ctx: Context, modules, label: str | None) -> bool:
+    """Apply modules in order, backing up the settings first under label
+    (no backup when label is None)."""
     if not ui.dry_run and any(m.needs_root(ctx) for m in modules):
         ui.info("Some steps need root:")
         if not privilege.warm_up(privilege.prefix() or []):
@@ -147,7 +149,7 @@ def run_modules(ctx: Context, modules, label: str) -> bool:
             ui.info(f'  su -c "apt-get install -y sudo && usermod -aG sudo {getpass.getuser()}"')
             ui.info("then log out and back in, and rerun.")
             return False
-    backed_up = ui.dry_run
+    backed_up = ui.dry_run or label is None
     for m in modules:
         # Back up right before the first settings change: after packages,
         # which may be what installs dconf.
@@ -196,10 +198,13 @@ def cmd_install(args) -> int:
         return 1
     show_plan(ctx, modules)
     print()
-    if not ui.confirm("Apply all of this? (your current settings are backed up first)", True):
+    backup = ui.confirm_backup("Apply all of this?")
+    if backup is None:
         ui.info("Nothing changed.")
         return 1
-    if not run_modules(ctx, modules, "before-install"):
+    if not backup and not ctx.state["initial_backup"] and any(m.needs_dconf for m in modules):
+        ui.warn("Without a backup from before the first install, uninstall can't put your settings back.")
+    if not run_modules(ctx, modules, "before-install" if backup else None):
         return 1
     if not ctx.state.installed:
         ctx.state.stamp("installed_at")
@@ -349,12 +354,12 @@ def post_update(ctx: Context, reapply: bool) -> int:
     if new_hash != ctx.state.get("config_hash"):
         ui.header("Configuration")
         ui.info("This version changes the desktop configuration.")
-        reapply = reapply or ui.confirm("Re-apply it now? (your current settings are backed up first)", False)
-        if reapply:
+        backup = True if reapply else ui.confirm_backup("Re-apply it now?", False)
+        if backup is not None:
             mods = [m for m in ALL if m.name not in ("packages", "extensions", "command")
                     and (m.default or m.name in ctx.state["modules"])]
             ctx.selected = {m.name for m in mods}
-            if not run_modules(ctx, mods, "before-update"):
+            if not run_modules(ctx, mods, "before-update" if backup else None):
                 return 1
             ctx.state["config_hash"] = new_hash
             changed = True
@@ -394,10 +399,11 @@ def cmd_uninstall(args) -> int:
     if st["packages_added"]:
         plan.append("offer to remove the packages it installed")
     ui.bullet_list(plan)
-    if not ui.confirm("Uninstall?", False):
+    backup = ui.confirm_backup("Uninstall?", False)
+    if backup is None:
         ui.info("Nothing changed.")
         return 1
-    if dconf.available() and session.has_session_bus():
+    if backup and dconf.available() and session.has_session_bus():
         folder = dconf.backup("before-uninstall")
         if folder:
             ui.ok(f"Current settings backed up to {folder}")
@@ -526,9 +532,10 @@ def cmd_restore(args) -> int:
         ui.error("Nothing recorded as changed, so there's nothing to restore.")
         return 1
     ui.info(f"This puts back every setting {APP_NAME} manages as it was in {folder.name}.")
-    if not ui.confirm("Restore?", False):
+    backup = ui.confirm_backup("Restore?", False)
+    if backup is None:
         return 1
-    if not dconf.backup("before-restore"):
+    if backup and not dconf.backup("before-restore"):
         return 1
     if dconf.restore(folder, st["dconf_sections"], st["dconf_trees"]):
         ui.ok("Restored")

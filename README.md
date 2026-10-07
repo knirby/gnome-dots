@@ -27,7 +27,7 @@ cd gnome-dots
 python3 install.py
 ```
 
-It checks the system, shows everything it is about to change and asks once. It backs up your current settings before changing anything, uses sudo only for packages, and asks to log out or reboot at the end, since GNOME loads new extensions at login. Rerunning it is safe. `python3 install.py --dry-run` shows the plan without changing anything.
+It checks the system, shows everything it is about to change and asks once: yes with a backup of your current settings first, yes without one, or cancel. It uses sudo only for packages, and asks to log out or reboot at the end, since GNOME loads new extensions at login. Rerunning it is safe. `python3 install.py --dry-run` shows the plan without changing anything.
 
 The clone can be deleted afterwards: the install copies itself to `~/.local/share/knirby-gnomedots` and adds the `knirby-gnomedots` command.
 
@@ -114,11 +114,11 @@ knirby-gnomedots uninstall         # remove everything it added
 knirby-gnomedots version
 ```
 
-`update` pulls the latest version of this repository, updates the extensions and re-detects the hardware. When the new version changes the configuration, it asks before re-applying it, and backs up your settings first. `--check` only reports whether an update exists.
+`update` pulls the latest version of this repository, updates the extensions and re-detects the hardware. When the new version changes the configuration, it asks before re-applying it, with or without backing up your settings first. `--check` only reports whether an update exists.
 
-`uninstall` removes the extensions it installed (ones you already had stay), the themes it downloaded, the hourly wallpaper check, its file blocks, launcher copies and the templates you haven't changed, the Rounded Blur library it built, the zsh addon (putting your old `.zshrc` back), the command and its copy of the repository. Downloaded wallpapers stay. It then puts back every setting it changed from the backup taken before the first install, unless you pass `--keep-settings`. It offers to remove the packages it installed, but never removes them unasked. Backups stay in `~/.local/state/knirby-gnomedots/backups`.
+`uninstall` removes the extensions it installed (ones you already had stay), the themes it downloaded, the hourly wallpaper check, its file blocks, launcher copies and the templates you haven't changed, the Rounded Blur library it built, the zsh addon (putting your old `.zshrc` back), the command and its copy of the repository. Downloaded wallpapers stay. It then puts back every setting it changed from the backup taken before the first install (if you skipped that backup, settings stay as they are), unless you pass `--keep-settings`. It offers to remove the packages it installed, but never removes them unasked. Backups stay in `~/.local/state/knirby-gnomedots/backups`.
 
-Every command accepts `--yes` to skip the questions, `--dry-run` to change nothing and `--verbose` to show each step. The log of the last run is at `~/.local/state/knirby-gnomedots/last-run.log` (`knirby-gnomedots status --log`).
+Every command accepts `--yes` to skip the questions (answering yes, with a backup), `--dry-run` to change nothing and `--verbose` to show each step. The log of the last run is at `~/.local/state/knirby-gnomedots/last-run.log` (`knirby-gnomedots status --log`).
 
 ## Changing the configuration
 
