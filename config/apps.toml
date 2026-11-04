@@ -12,23 +12,7 @@ favorites = [
     ["org.mozilla.firefox.desktop", "firefox.desktop", "firefox-esr.desktop"],
 ]
 
-# ArcMenu pinned apps.
-arcmenu_pinned = [
-    ["org.gnome.Nautilus.desktop"],
-]
-
-# ArcMenu side shortcuts. "@terminal" and "@extensions" are the slots below;
-# "separator" draws a line.
-arcmenu_shortcuts = [
-    "@terminal",
-    "org.gnome.Settings.desktop",
-    "separator",
-    "@extensions",
-    "org.gnome.tweaks.desktop",
-    "menulibre.desktop",
-]
-
-# Terminal for Super+T, Global Menu and ArcMenu: desktop file + command.
+# Terminal for Super+T: desktop file + command.
 [[terminal]]
 desktop = "org.gnome.Ptyxis.desktop"
 cmd = "ptyxis"
@@ -51,7 +35,7 @@ cmd = "alacritty"
 desktop = "xterm.desktop"
 cmd = "xterm"
 
-# Software centre opened from Global Menu.
+# Software centre (the logo menu opens GNOME Software when it is installed).
 [[software]]
 desktop = "org.gnome.Software.desktop"
 cmd = "gnome-software"
@@ -62,7 +46,7 @@ cmd = "pamac-manager"
 desktop = "io.github.kolunmi.Bazaar.desktop"
 cmd = "flatpak run io.github.kolunmi.Bazaar"
 
-# Extension manager opened from Global Menu and ArcMenu.
+# Extension manager.
 [[extensions]]
 desktop = "com.mattjakeman.ExtensionManager.desktop"
 [[extensions]]

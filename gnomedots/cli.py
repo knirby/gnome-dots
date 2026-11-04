@@ -383,7 +383,7 @@ def cmd_uninstall(args) -> int:
     plan = [
         f"remove {len(ours)} extensions it installed (ones you had before stay)",
         f"remove downloaded themes: {', '.join(st['themes']) or 'none'}",
-        "remove the gtk.css block, the Super+T shortcut, the Tux logo, the hourly wallpaper job "
+        "remove the gtk.css block, the Super+T shortcut, the square logo icons, the hourly wallpaper job "
         "and its launcher copies",
         "remove the file templates it added that you haven't changed",
         f"remove {LAUNCHER}, {APP_DIR} and the PATH lines it added",
@@ -414,7 +414,7 @@ def cmd_uninstall(args) -> int:
         ("settings", lambda: restore and dconf.restore(Path(initial), st["dconf_sections"], st["dconf_trees"])),
         ("keybindings", lambda: BY_NAME["keybindings"].remove(ctx)),
         ("themes", lambda: BY_NAME["themes"].remove(ctx)),
-        ("menu-logo", lambda: BY_NAME["menu-logo"].remove(ctx)),
+        ("menu-logo", menulogo.remove_os_logo),
         ("gtk", lambda: BY_NAME["gtk"].remove(ctx)),
         ("app-icons", lambda: BY_NAME["app-icons"].remove(ctx)),
         ("templates", lambda: BY_NAME["templates"].remove(ctx)),
@@ -491,7 +491,6 @@ def cmd_detect(args) -> int:
         "terminal": (ctx.terminal or {}).get("cmd"),
         "software_center": (ctx.software or {}).get("cmd"),
         "extensions_app": ctx.extensions_app,
-        "menu_logo": menulogo.choose(ctx)[1],
         **{k: json.loads(v) if isinstance(v, str) and v.startswith("{") else v for k, v in hw.items()},
     }
     print(json.dumps(out, indent=2, ensure_ascii=False))

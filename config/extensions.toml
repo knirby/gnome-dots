@@ -17,13 +17,6 @@
 # An extension with no build for the running GNOME is skipped, never forced.
 
 [[extension]]
-uuid = "arcmenu@arcmenu.com"
-name = "ArcMenu"
-source = "ego"
-settings = "arcmenu.ini"
-dconf = "/org/gnome/shell/extensions/arcmenu/"
-
-[[extension]]
 uuid = "blur-my-shell@aunetx"
 name = "Blur my Shell"
 # Built from this exact upstream commit, not the extensions.gnome.org release.
@@ -79,11 +72,18 @@ settings = "rounded-window-corners.ini"
 dconf = "/org/gnome/shell/extensions/rounded-window-corners-reborn/"
 
 [[extension]]
-uuid = "globalmenu@ShiroOSL.github.io"
+uuid = "gnome-global-menu@felipefelix"
 name = "Global Menu"
-source = "ego"
-settings = "globalmenu.ini"
-dconf = "/org/gnome/shell/extensions/globalmenu/"
+# The application's real menu bar plus the logo menu (About This Linux, Force Quit, power items).
+# Built from the repository with npm; native Wayland menus for Qt 6, Firefox and Electron also
+# need the patched Mutter from knirby/gnome-appmenu, the rest works without it.
+source = "github"
+repo = "knirby/gnome-global-menu"
+branches = ["main"]
+build = ["sh", "-c", "npm ci --no-audit --no-fund && npm run pack"]
+artifact = "gnome-global-menu@felipefelix.shell-extension.zip"
+settings = "global-menu.ini"
+dconf = "/org/gnome/shell/extensions/gnome-global-menu/"
 
 [[extension]]
 uuid = "medialine@funinkina.co.in"
@@ -157,7 +157,7 @@ uuids = [
     "ubuntu-appindicators@ubuntu.com",              # tray icons twice, beside AppIndicator Support
     "ding@rastersoft.com",                          # older desktop icons, beside Desktop Icons NG
     "dash-to-panel@jderose9.github.com",            # replaces the top bar this setup styles
-    "apps-menu@gnome-shell-extensions.gcampax.github.com",   # second menu beside ArcMenu
+    "apps-menu@gnome-shell-extensions.gcampax.github.com",   # second menu beside the logo menu
     "places-menu@gnome-shell-extensions.gcampax.github.com",
     "window-list@gnome-shell-extensions.gcampax.github.com",
 ]

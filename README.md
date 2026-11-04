@@ -1,6 +1,6 @@
 # gnome-dots
 
-knirby's GNOME desktop in one command: dark Adwaita with an accent colour that follows the wallpaper, Mint-Y-Grey icons, the Bibata Modern Ice cursor, frosted blur everywhere, rounded windows, ArcMenu with your distribution's logo, a system monitor in the top bar, a bottom dock and a new Bing wallpaper every day. It's written in Python, so it works the same from bash, zsh or fish, on any of the supported distributions. Built for GNOME 50, and runs on GNOME 46 and newer. Licensed under GPL-3.0-only; see [LICENSE](LICENSE).
+knirby's GNOME desktop in one command: dark Adwaita with an accent colour that follows the wallpaper, Mint-Y-Grey icons, the Bibata Modern Ice cursor, frosted blur everywhere, rounded windows, a macOS-style top bar (your distribution's logo menu with About This Linux and the power items, then the focused app's real menus, the clock in the centre), a system monitor in the top bar, a bottom dock and a new Bing wallpaper every day. It's written in Python, so it works the same from bash, zsh or fish, on any of the supported distributions. Built for GNOME 50, and runs on GNOME 46 and newer. Licensed under GPL-3.0-only; see [LICENSE](LICENSE).
 
 ![The desktop over a Bing picture of a mossy forest](docs/preview-forest.webp)
 ![The same desktop over penguins on snow: the accent colour has followed the wallpaper](docs/preview-penguins.webp)
@@ -43,7 +43,7 @@ The clone can be deleted afterwards: the install copies itself to `~/.local/shar
 
 GNOME Shell 50 is what it's built and tested for, such as Debian testing or Fedora 44. GNOME 46 to 49 also work, such as Debian 13 (GNOME 48) or Ubuntu 24.04 (GNOME 46): the installer warns, then installs every extension built for that version and skips any that isn't. Newer versions run after a warning; versions older than 46 are refused unless you pass `--force`.
 
-On [Bedrock Linux](https://bedrocklinux.org), packages go to the stratum that provides gnome-shell, and the ArcMenu button shows the Bedrock logo from [brl-tools](https://github.com/knirby/brl-tools) when it's installed. On other distributions that use one of the package managers above, the installer asks before using it. On anything else, and on image-based systems such as Silverblue, it skips packages and applies everything else. Slackware isn't supported: GNOME isn't in its official tree.
+On [Bedrock Linux](https://bedrocklinux.org), packages go to the stratum that provides gnome-shell, and the logo menu shows its square mark from [brl-tools](https://github.com/knirby/brl-tools) when it's installed (the Global Menu looks for the distribution's square logo itself). On other distributions that use one of the package managers above, the installer asks before using it. On anything else, and on image-based systems such as Silverblue, it skips packages and applies everything else. Slackware isn't supported: GNOME isn't in its official tree.
 
 ## What it sets up
 
@@ -52,13 +52,12 @@ On [Bedrock Linux](https://bedrocklinux.org), packages go to the stratum that pr
 | `packages` | Noto Sans/Serif and Fira Code fonts, Ptyxis, GNOME Tweaks, dconf and the build tools, from your repositories |
 | `themes` | Mint-Y-Grey icons and Bibata Modern Ice; downloaded from upstream into `~/.local/share/icons` where the distribution doesn't package them |
 | `app-icons` | Files shows the Mint-Y-Grey folder and Ptyxis the Mint-Y terminal, through copies of their launchers in `~/.local/share/applications` that change only the icon; a launcher you edited yourself is left alone |
-| `extensions` | 18 extensions (below), built for your GNOME version; conflicting ones (Ubuntu Dock, Dash to Panel, ...) are disabled, never removed |
+| `extensions` | 17 extensions (below), built for your GNOME version; conflicting ones (Ubuntu Dock, Dash to Panel, ...) are disabled, never removed |
 | `rounded-blur` | the [GNOME Rounded Blur](https://github.com/kancko/gnome-rounded-blur) library Blur my Shell needs for rounded corners on its blur, built for your GNOME and installed to `/usr` (skipped when it's already installed); `update` rebuilds it after a GNOME upgrade |
 | `wallpaper` | today's Bing picture right away, then each new one as it comes out, shown once on arrival; Wallpaper Slideshow cycles them every 10 minutes and old ones are kept up to 200 MB (details below) |
 | `settings` | theme, fonts, clock, windows, workspaces, every extension's configuration, and the dock favourites, added after the apps you already have pinned (each once, so one you unpin stays off) |
 | `input` | flat mouse acceleration and speed, num lock on; keyboard layouts are left alone |
 | `keybindings` | the shortcuts below |
-| `menu-logo` | your distribution's logo on the ArcMenu button, Tux when ArcMenu has none |
 | `sysmon` | finds this machine's CPU temperature sensor, a spinning fan (or a GPU/disk temperature), the GPU and the system disk for the top bar monitor, without asking |
 | `gtk` | translucent header bars in GTK 4 apps, as a marked block in `~/.config/gtk-4.0/gtk.css` |
 | `templates` | Files' right-click **New Document** menu, empty on a fresh install, gets a text file, Markdown, a document, spreadsheet and presentation (when an office suite is installed) and a Code submenu: shell and Python scripts, HTML, CSS, JavaScript, JSON, YAML, TOML and a Makefile. They go in `~/Templates`, set up as the templates folder where none is; templates you already have, or edit or delete, are left as they are |
@@ -71,13 +70,13 @@ The accent colour comes from Auto Accent Colour, which picks it from each wallpa
 
 **Bing wallpapers.** Wallpaper Slideshow's own downloader refetches 12 hours after its last fetch, timed on a clock that stops during suspend and restarts at every login, so a machine that sleeps a lot can go days without a new picture. The setup adds an hourly check: a systemd user timer that also catches up after suspend, or a check that starts at login where systemd doesn't manage user services. It fetches the newest pictures under the same names the extension uses, switches to each day's picture once when it arrives, and falls back to 1920x1080 where Bing doesn't publish the chosen size. Pictures stay in `~/Pictures/Bing Wallpapers` until the folder passes 200 MB (`keep_mb` in [config/themes.toml](config/themes.toml)); then the oldest are deleted, never the one on screen.
 
-**Extensions:** ArcMenu, Blur my Shell, Dash to Dock, Just Perfection, Astra Monitor, Wallpaper Slideshow, Auto Accent Colour, Rounded Window Corners Reborn, Global Menu, Medialine, Clipboard Indicator, Lightning Launcher, Desktop Icons NG, GNOME UI Tune, Unlock Dialog Background, AppIndicator Support, Removable Drive Menu and [Super Scroll Zoom](https://github.com/knirby/super-scroll-zoom). They come from extensions.gnome.org, built for your GNOME version, except Super Scroll Zoom, which comes from its GitHub repository (`main` for GNOME 50 and newer, the `gnome-46-49` branch before that), and Blur my Shell, which is built from upstream commit `99660f4` instead of the extensions.gnome.org release. Its version is set to 9999, so GNOME's automatic updates and Extension Manager leave it alone.
+**Extensions:** Blur my Shell, Dash to Dock, Just Perfection, Astra Monitor, Wallpaper Slideshow, Auto Accent Colour, Rounded Window Corners Reborn, Global Menu, Medialine, Clipboard Indicator, Lightning Launcher, Desktop Icons NG, GNOME UI Tune, Unlock Dialog Background, AppIndicator Support, Removable Drive Menu and [Super Scroll Zoom](https://github.com/knirby/super-scroll-zoom). They come from extensions.gnome.org, built for your GNOME version, except [Global Menu](https://github.com/knirby/gnome-global-menu), which is built from its repository (needs `npm`; GNOME 50 only, skipped on older versions), Super Scroll Zoom, which comes from its GitHub repository (`main` for GNOME 50 and newer, the `gnome-46-49` branch before that), and Blur my Shell, which is built from upstream commit `99660f4` instead of the extensions.gnome.org release. Its version is set to 9999, so GNOME's automatic updates and Extension Manager leave it alone.
 
 **Shortcuts:**
 
 | Keys | Action |
 | --- | --- |
-| Super, Super+M | ArcMenu |
+| Super | overview |
 | Super+Space | app and file launcher |
 | Super+T | terminal |
 | Super+E | files |
@@ -126,4 +125,4 @@ Settings live in plain `dconf dump` files under [config/dconf](config/dconf), on
 
 ## Credits
 
-Tux by Larry Ewing (lewing@isc.tamu.edu), made with The GIMP. Each extension belongs to its authors; follow the links on its extensions.gnome.org page.
+Each extension belongs to its authors; follow the links on its extensions.gnome.org page.

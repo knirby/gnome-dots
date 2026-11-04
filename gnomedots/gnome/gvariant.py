@@ -22,7 +22,7 @@ def dump(value) -> str:
             return "@as []"
         return "[" + ", ".join(dump(v) for v in value) + "]"
     if isinstance(value, dict):
-        # a{sv}-like list entries such as ArcMenu's [{'id': <...>}] are written as a{ss}
+        # a{sv}-like list entries such as [{'id': <...>}] are written as a{ss}
         return "{" + ", ".join(f"{quote(k)}: {dump(v)}" for k, v in value.items()) + "}"
     raise TypeError(f"cannot write {type(value).__name__} as GVariant")
 

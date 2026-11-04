@@ -12,7 +12,6 @@ from .command import Command
 from .extensions import Extensions
 from .gtk import GtkCss
 from .keybindings import Keybindings
-from .menulogo import MenuLogo
 from .packages import Packages
 from .roundedblur import RoundedBlur
 from .settings import Input, Settings
@@ -23,5 +22,5 @@ from .wallpaper import Wallpaper
 from .zsh import Zsh
 
 ALL = [Packages(), Command(), Themes(), AppIcons(), Extensions(), RoundedBlur(), Wallpaper(),
-       Settings(), Input(), Keybindings(), MenuLogo(), SystemMonitor(), GtkCss(), Templates(), Zsh()]
+       Settings(), Input(), Keybindings(), SystemMonitor(), GtkCss(), Templates(), Zsh()]
 BY_NAME = {m.name: m for m in ALL}

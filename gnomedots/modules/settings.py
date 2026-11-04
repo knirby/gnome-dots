@@ -7,7 +7,6 @@ from ..gnome import extensions as ext
 from .base import Module
 from .wallpaper import resolution
 
-SEPARATOR = {"name": "Separator", "icon": "list-remove-symbolic", "id": "ArcMenu_Separator"}
 FAVORITES = "/org/gnome/shell/favorite-apps"
 
 
@@ -22,19 +21,8 @@ def current_favorites() -> list[str]:
 
 def template_values(ctx) -> dict:
     """Values for the @NAME@ placeholders. None leaves that key untouched."""
-    cfg = ctx.apps_config
     terminal = ctx.terminal
     software = ctx.software
-    shortcuts = []
-    for item in cfg.get("arcmenu_shortcuts", []):
-        if item == "separator":
-            shortcuts.append(SEPARATOR)
-            continue
-        app = {"@terminal": terminal["desktop"] if terminal else None,
-               "@extensions": ctx.extensions_app}.get(item, item)
-        if app and apps.installed(app):
-            shortcuts.append({"id": app})
-    pinned = [{"id": a} for a in (apps.first_installed(slot) for slot in cfg.get("arcmenu_pinned", [])) if a]
 
     def version(uuid):
         v = ext.installed_version(uuid)
@@ -47,9 +35,6 @@ def template_values(ctx) -> dict:
         "BING_DIR": str(ctx.wallpaper_dir()),
         "BING_RESOLUTION": resolution(ctx),
         "WALLPAPER_PATH": None,
-        "ARCMENU_SHORTCUTS": shortcuts or None,
-        "ARCMENU_PINNED": pinned or None,
-        "ARCMENU_VERSION": version("arcmenu@arcmenu.com"),
         "AZWALLPAPER_VERSION": version("azwallpaper@azwallpaper.gitlab.com"),
     }
     values.update({k: v for k, v in ctx.vars.items() if k.isupper()})
@@ -82,7 +67,7 @@ class Settings(Module):
         t = ctx.terminal
         return [
             "dark Adwaita, accent colour picked from the wallpaper, Mint-Y-Grey icons, Bibata cursor, Noto Sans + Fira Code",
-            "top bar: ArcMenu, Astra Monitor, media, clock on the right; dock at the bottom",
+            "top bar: logo menu and the app's menus, media, clock in the centre, Astra Monitor; dock at the bottom",
             "blur everywhere, rounded corners, 2 fixed workspaces",
             f"terminal: {t['cmd'] if t else 'none found'}",
             "every managed extension's settings are reset to this configuration",

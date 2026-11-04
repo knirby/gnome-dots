@@ -36,6 +36,14 @@ pacman = "make"
 portage = "sys-devel/make"
 xbps = "make"
 
+[nodejs]
+why = "builds the Global Menu extension (TypeScript)"
+apt = "npm"
+dnf = "npm"
+pacman = "npm"
+portage = "net-libs/nodejs"
+xbps = "nodejs"
+
 [gettext]
 why = "builds Blur my Shell's translations"
 required = true
@@ -106,7 +114,7 @@ portage = "x11-terms/ptyxis"
 xbps = "ptyxis"
 
 [gnome-tweaks]
-why = "GNOME Tweaks, linked from ArcMenu"
+why = "GNOME Tweaks"
 apt = "gnome-tweaks"
 dnf = "gnome-tweaks"
 pacman = "gnome-tweaks"
@@ -114,7 +122,7 @@ portage = "gnome-extra/gnome-tweaks"
 xbps = "gnome-tweaks"
 
 [extension-manager]
-why = "Extension Manager, linked from ArcMenu and Global Menu"
+why = "Extension Manager"
 apt = "gnome-shell-extension-manager"
 pacman = "extension-manager"
 xbps = "extension-manager"
@@ -125,7 +133,7 @@ apt = "gnome-shell-extension-prefs"
 dnf = "gnome-extensions-app"
 
 [menulibre]
-why = "menu editor, linked from ArcMenu"
+why = "menu editor"
 apt = "menulibre"
 
 [zsh]
