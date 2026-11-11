@@ -103,11 +103,11 @@ class Settings(Module):
 class Input(Module):
     name = "input"
     title = "Mouse and keyboard feel"
-    summary = "flat mouse acceleration and speed, num lock on (layouts untouched)"
+    summary = "flat mouse acceleration, num lock on (pointer speed and layouts untouched)"
     needs_dconf = True
 
     def plan(self, ctx):
-        return ["mouse: flat acceleration, speed -0.34; num lock on at login"]
+        return ["mouse: flat acceleration (speed untouched); num lock on at login"]
 
     def apply(self, ctx):
         if load_templates(ctx, ["input.ini"]):
