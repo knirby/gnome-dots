@@ -48,6 +48,22 @@ def set_block(path: Path, body: str, style: str) -> None:
         util.write_text(path, new)
 
 
+def unmark_block(path: Path, style: str) -> bool:
+    """Drop the marker lines of the block but keep what's between them, so the
+    content becomes the user's own and the tool no longer manages it."""
+    try:
+        text = path.read_text()
+    except OSError:
+        return False
+    begin, end = _markers(style)
+    if begin not in text:
+        return False
+    new = re.sub(r"^[ \t]*" + re.escape(begin) + r"[ \t]*\n?", "", text, count=1, flags=re.M)
+    new = re.sub(r"^[ \t]*" + re.escape(end) + r"[ \t]*\n?", "", new, count=1, flags=re.M)
+    util.write_text(path, new)
+    return True
+
+
 def remove_block(path: Path, style: str) -> bool:
     try:
         text = path.read_text()

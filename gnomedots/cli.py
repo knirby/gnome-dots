@@ -440,6 +440,49 @@ def cmd_uninstall(args) -> int:
     return 0 if not ctx.failures else 2
 
 
+def cmd_liberate(args) -> int:
+    """Remove the tool but leave everything it configured exactly as it is."""
+    from . import blocks
+    from .modules.command import shell_files
+    from .modules.gtk import TARGET as GTK_CSS
+    from .paths import STATE_DIR
+    ctx = make_context(args)
+    ui.open_log(LOG_FILE)
+    ui.header(f"Liberating the desktop from {APP_NAME}")
+    ui.bullet_list([
+        f"remove {LAUNCHER} and {APP_DIR} (your clone, if you still have one, is untouched)",
+        "remove the hourly wallpaper job, which runs the command (the pictures and Wallpaper Slideshow stay)",
+        "turn the marked blocks in your shell files and gtk.css into plain text, so nothing manages them any more",
+        "forget what it recorded about the install, so a later install starts fresh",
+        "keep everything else as it is: settings, extensions, themes, icons, shortcuts, templates, "
+        "the zsh profile, packages and the settings backups",
+    ])
+    if not ui.confirm("Liberate?", False):
+        ui.info("Nothing changed.")
+        return 1
+    steps = [
+        ("wallpaper", lambda: wallpapers.remove_schedule()),
+        ("shell files", lambda: [blocks.unmark_block(rc, style) for _, rc, _, style in shell_files()]),
+        ("gtk.css", lambda: blocks.unmark_block(GTK_CSS, "css")),
+        ("command", lambda: [util.remove_tree(p) for p in (
+            LAUNCHER, *(APP_DIR.with_name(APP_DIR.name + s) for s in ("", ".new", ".old")))]),
+    ]
+    for name, fn in steps:
+        try:
+            fn()
+        except Exception as e:
+            ui.error(f"{name}: {e}")
+            ctx.failures.append(name)
+    if not ui.dry_run:
+        STATE_FILE.unlink(missing_ok=True)
+        shutil.rmtree(CACHE_DIR, ignore_errors=True)
+    ui.ok(f"{APP_NAME} is gone; your desktop is exactly as it was")
+    ui.info(f"Settings backups and the log are kept in {STATE_DIR}.")
+    if ctx.failures:
+        ui.warn("Some steps had problems: " + ", ".join(ctx.failures))
+    return 0 if not ctx.failures else 2
+
+
 def cmd_status(args) -> int:
     if args.log:
         try:
@@ -588,6 +631,9 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("uninstall", parents=[common], help="remove everything this tool added")
     s.add_argument("--keep-settings", action="store_true", help="don't restore the pre-install settings")
     s.set_defaults(func=cmd_uninstall)
+
+    sub.add_parser("liberate", parents=[common],
+                   help="remove the tool but keep all the configuration it applied").set_defaults(func=cmd_liberate)
 
     s = sub.add_parser("status", parents=[common], help="show what's installed")
     s.add_argument("--log", action="store_true", help="print the log of the last run")

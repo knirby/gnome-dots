@@ -111,12 +111,15 @@ knirby-gnomedots wallpapers clean  # delete saved pictures except the current on
 knirby-gnomedots backup            # back up the current settings
 knirby-gnomedots restore [NAME]    # put managed settings back from a backup
 knirby-gnomedots uninstall         # remove everything it added
+knirby-gnomedots liberate          # remove only the tool, keep all the configuration
 knirby-gnomedots version
 ```
 
 `update` pulls the latest version of this repository, updates the extensions and re-detects the hardware. When the new version changes the configuration, it asks before re-applying it, with or without backing up your settings first. `--check` only reports whether an update exists.
 
 `uninstall` removes the extensions it installed (ones you already had stay), the themes it downloaded, the hourly wallpaper check, its file blocks, launcher copies and the templates you haven't changed, the Rounded Blur library it built, the zsh addon (putting your old `.zshrc` back), the command and its copy of the repository. Downloaded wallpapers stay. It then puts back every setting it changed from the backup taken before the first install (if you skipped that backup, settings stay as they are), unless you pass `--keep-settings`. It offers to remove the packages it installed, but never removes them unasked. Backups stay in `~/.local/state/knirby-gnomedots/backups`.
+
+`liberate` is the gentle way out: it removes only the tool, so the desktop stays exactly as it is. The command, its copy of the repository, the hourly wallpaper check (which runs the command) and what it recorded about the install go. The marked blocks in your shell files and `gtk.css` lose their markers and become plain text of yours. Settings, extensions, themes, icons, shortcuts, templates, the zsh profile, packages, downloaded wallpapers and the settings backups all stay. Nothing is restored from a backup.
 
 Every command accepts `--yes` to skip the questions (answering yes, with a backup), `--dry-run` to change nothing and `--verbose` to show each step. The log of the last run is at `~/.local/state/knirby-gnomedots/last-run.log` (`knirby-gnomedots status --log`).
 
