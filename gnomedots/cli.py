@@ -408,6 +408,7 @@ def cmd_uninstall(args) -> int:
         if folder:
             ui.ok(f"Current settings backed up to {folder}")
     steps = [
+        ("global-menu", lambda: BY_NAME["global-menu"].remove(ctx)),
         ("extensions", lambda: BY_NAME["extensions"].remove(ctx)),
         ("wallpaper", lambda: BY_NAME["wallpaper"].remove(ctx)),
         ("zsh", lambda: BY_NAME["zsh"].remove(ctx)),
@@ -565,7 +566,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--skip", nargs="+", metavar="MODULE", default=[], help="leave out these modules")
     s.add_argument("--only", nargs="+", metavar="MODULE", default=[], help="run only these modules")
     s.add_argument("--with", dest="with_", nargs="+", metavar="ADDON", default=[],
-                   help="include opt-in addons (zsh)")
+                   help="include opt-in addons (zsh, global-menu)")
     s.add_argument("--force", action="store_true", help="run on an untested GNOME version")
     s.set_defaults(func=cmd_install)
 

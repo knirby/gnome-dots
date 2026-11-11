@@ -38,6 +38,7 @@ xbps = "make"
 
 [nodejs]
 why = "builds the Global Menu extension (TypeScript)"
+module = "global-menu"
 apt = "npm"
 dnf = "npm"
 pacman = "npm"

@@ -10,6 +10,7 @@ extensions' settings folders.
 from .appicons import AppIcons
 from .command import Command
 from .extensions import Extensions
+from .globalmenu import GlobalMenu
 from .gtk import GtkCss
 from .keybindings import Keybindings
 from .packages import Packages
@@ -22,5 +23,5 @@ from .wallpaper import Wallpaper
 from .zsh import Zsh
 
 ALL = [Packages(), Command(), Themes(), AppIcons(), Extensions(), RoundedBlur(), Wallpaper(),
-       Settings(), Input(), Keybindings(), SystemMonitor(), GtkCss(), Templates(), Zsh()]
+       Settings(), Input(), GlobalMenu(), Keybindings(), SystemMonitor(), GtkCss(), Templates(), Zsh()]
 BY_NAME = {m.name: m for m in ALL}

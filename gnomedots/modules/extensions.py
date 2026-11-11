@@ -20,7 +20,7 @@ def github_ref(e: dict, shell_major: int) -> str | None:
 class Extensions(Module):
     name = "extensions"
     title = "GNOME Shell extensions"
-    summary = "Global Menu, Blur my Shell, Dash to Dock, Astra Monitor and the rest"
+    summary = "Blur my Shell, Dash to Dock, Astra Monitor and the rest"
     needs_dconf = True
     needs_network = True
 
