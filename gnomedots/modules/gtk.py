@@ -1,25 +1,36 @@
-"""Translucent header bars for GTK 4 apps, as a block in the user's gtk.css."""
+"""Header bar styling for GTK apps, as blocks in the user's gtk.css files.
+
+GTK 4 gets translucent header bars. GTK 3 gets round, padded window buttons,
+which is also what Chromium, Electron and libdecor windows draw on Wayland.
+"""
 
 from .. import blocks, ui
 from ..paths import CONFIG_HOME
 from .base import Module
 
-TARGET = CONFIG_HOME / "gtk-4.0" / "gtk.css"
+# (config file, user file)
+FILES = (
+    ("gtk/gtk-4.0.css", CONFIG_HOME / "gtk-4.0" / "gtk.css"),
+    ("gtk/gtk-3.0.css", CONFIG_HOME / "gtk-3.0" / "gtk.css"),
+)
+TARGETS = tuple(target for _, target in FILES)
 
 
 class GtkCss(Module):
     name = "gtk"
-    title = "GTK 4 header bars"
-    summary = "translucent header bars, added to ~/.config/gtk-4.0/gtk.css"
+    title = "GTK header bars"
+    summary = "translucent GTK 4 header bars and round window buttons, added to the gtk.css files"
 
     def plan(self, ctx):
-        return [f"add a marked block to {TARGET} (the rest of the file is kept)"]
+        return [f"add a marked block to {target} (the rest of the file is kept)" for target in TARGETS]
 
     def apply(self, ctx):
-        blocks.set_block(TARGET, ctx.config_text("gtk/gtk-4.0.css"), "css")
-        ctx.state.add_unique("edited_files", str(TARGET))
-        ui.ok("Header bar style added")
+        for source, target in FILES:
+            blocks.set_block(target, ctx.config_text(source), "css")
+            ctx.state.add_unique("edited_files", str(target))
+        ui.ok("Header bar and window button styles added")
 
     def remove(self, ctx):
-        if blocks.remove_block(TARGET, "css"):
-            ui.ok(f"Removed the block from {TARGET}")
+        for target in TARGETS:
+            if blocks.remove_block(target, "css"):
+                ui.ok(f"Removed the block from {target}")

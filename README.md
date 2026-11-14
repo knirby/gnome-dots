@@ -59,7 +59,7 @@ On [Bedrock Linux](https://bedrocklinux.org), packages go to the stratum that pr
 | `input` | flat mouse acceleration, num lock on; pointer speed and keyboard layouts are left alone |
 | `keybindings` | the shortcuts below |
 | `sysmon` | finds this machine's CPU temperature sensor, a spinning fan (or a GPU/disk temperature), the GPU and the system disk for the top bar monitor, without asking |
-| `gtk` | translucent header bars in GTK 4 apps, as a marked block in `~/.config/gtk-4.0/gtk.css` |
+| `gtk` | translucent header bars in GTK 4 apps, and round, padded window buttons for GTK 3 header bars, which is also how Chromium, Electron and libdecor (SDL) windows draw their titlebar on Wayland; marked blocks in `~/.config/gtk-4.0/gtk.css` and `~/.config/gtk-3.0/gtk.css` |
 | `templates` | Files' right-click **New Document** menu, empty on a fresh install, gets a text file, Markdown, a document, spreadsheet and presentation (when an office suite is installed) and a Code submenu: shell and Python scripts, HTML, CSS, JavaScript, JSON, YAML, TOML and a Makefile. They go in `~/Templates`, set up as the templates folder where none is; templates you already have, or edit or delete, are left as they are |
 | `command` | the `knirby-gnomedots` command, with `~/.local/bin` added to bash, zsh and fish if it isn't on PATH yet |
 | `zsh` | **optional addon**: Oh My Zsh with git, sudo, zsh-autosuggestions and zsh-syntax-highlighting, knirby's prompt (`(exit status) /path (branch) $`, time on the right) and zsh as the login shell |
@@ -119,7 +119,7 @@ knirby-gnomedots version
 
 `uninstall` removes the extensions it installed (ones you already had stay), the themes it downloaded, the hourly wallpaper check, its file blocks, launcher copies and the templates you haven't changed, the Rounded Blur library it built, the zsh addon (putting your old `.zshrc` back), the command and its copy of the repository. Downloaded wallpapers stay. It then puts back every setting it changed from the backup taken before the first install (if you skipped that backup, settings stay as they are), unless you pass `--keep-settings`. It offers to remove the packages it installed, but never removes them unasked. Backups stay in `~/.local/state/knirby-gnomedots/backups`.
 
-`liberate` is the gentle way out: it removes only the tool, so the desktop stays exactly as it is. The command, its copy of the repository, the hourly wallpaper check (which runs the command) and what it recorded about the install go. The marked blocks in your shell files and `gtk.css` lose their markers and become plain text of yours. Settings, extensions, themes, icons, shortcuts, templates, the zsh profile, packages, downloaded wallpapers and the settings backups all stay. Nothing is restored from a backup.
+`liberate` is the gentle way out: it removes only the tool, so the desktop stays exactly as it is. The command, its copy of the repository, the hourly wallpaper check (which runs the command) and what it recorded about the install go. The marked blocks in your shell files and `gtk.css` files lose their markers and become plain text of yours. Settings, extensions, themes, icons, shortcuts, templates, the zsh profile, packages, downloaded wallpapers and the settings backups all stay. Nothing is restored from a backup.
 
 Every command accepts `--yes` to skip the questions (answering yes, with a backup), `--dry-run` to change nothing and `--verbose` to show each step. The log of the last run is at `~/.local/state/knirby-gnomedots/last-run.log` (`knirby-gnomedots status --log`).
 

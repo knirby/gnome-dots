@@ -1,0 +1,32 @@
+/* Window buttons in GTK 3 header bars: round, padded, steady on hover.
+   Chromium and Electron draw their client-side titlebar by rendering these
+   nodes through GTK 3, and libdecor (SDL apps) does the same, so this one
+   block gives every such window the same buttons as libadwaita. The bar stays
+   slim: a 24px button with 5px above and below is 34px. */
+headerbar.titlebar {
+  padding-left: 10px;
+  padding-right: 16px;
+}
+
+headerbar.titlebar button.titlebutton {
+  min-width: 24px;
+  min-height: 24px;
+  margin: 5px 0;
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  box-shadow: none;
+  background-image: none;
+  background-color: alpha(@theme_fg_color, 0.10);
+}
+
+/* Chromium paints one image per button state and crossfades between them over
+   a hardcoded 150 ms, which no setting turns off. Hover looks like the normal
+   state, so there is nothing to fade; pressed still shows. */
+headerbar.titlebar button.titlebutton:hover {
+  background-color: alpha(@theme_fg_color, 0.10);
+}
+
+headerbar.titlebar button.titlebutton:active {
+  background-color: alpha(@theme_fg_color, 0.24);
+}

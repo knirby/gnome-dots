@@ -383,7 +383,7 @@ def cmd_uninstall(args) -> int:
     plan = [
         f"remove {len(ours)} extensions it installed (ones you had before stay)",
         f"remove downloaded themes: {', '.join(st['themes']) or 'none'}",
-        "remove the gtk.css block, the Super+T shortcut, the square logo icons, the hourly wallpaper job "
+        "remove the gtk.css blocks, the Super+T shortcut, the square logo icons, the hourly wallpaper job "
         "and its launcher copies",
         "remove the file templates it added that you haven't changed",
         f"remove {LAUNCHER}, {APP_DIR} and the PATH lines it added",
@@ -444,7 +444,7 @@ def cmd_liberate(args) -> int:
     """Remove the tool but leave everything it configured exactly as it is."""
     from . import blocks
     from .modules.command import shell_files
-    from .modules.gtk import TARGET as GTK_CSS
+    from .modules.gtk import TARGETS as GTK_CSS_FILES
     from .paths import STATE_DIR
     ctx = make_context(args)
     ui.open_log(LOG_FILE)
@@ -452,7 +452,7 @@ def cmd_liberate(args) -> int:
     ui.bullet_list([
         f"remove {LAUNCHER} and {APP_DIR} (your clone, if you still have one, is untouched)",
         "remove the hourly wallpaper job, which runs the command (the pictures and Wallpaper Slideshow stay)",
-        "turn the marked blocks in your shell files and gtk.css into plain text, so nothing manages them any more",
+        "turn the marked blocks in your shell files and gtk.css files into plain text, so nothing manages them any more",
         "forget what it recorded about the install, so a later install starts fresh",
         "keep everything else as it is: settings, extensions, themes, icons, shortcuts, templates, "
         "the zsh profile, packages and the settings backups",
@@ -463,7 +463,7 @@ def cmd_liberate(args) -> int:
     steps = [
         ("wallpaper", lambda: wallpapers.remove_schedule()),
         ("shell files", lambda: [blocks.unmark_block(rc, style) for _, rc, _, style in shell_files()]),
-        ("gtk.css", lambda: blocks.unmark_block(GTK_CSS, "css")),
+        ("gtk.css", lambda: [blocks.unmark_block(css, "css") for css in GTK_CSS_FILES]),
         ("command", lambda: [util.remove_tree(p) for p in (
             LAUNCHER, *(APP_DIR.with_name(APP_DIR.name + s) for s in ("", ".new", ".old")))]),
     ]
